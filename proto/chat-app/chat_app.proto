@@ -1,0 +1,23 @@
+syntax = "proto3";
+package chat_app;
+option go_package = "chat-app/proto/chat-app";
+
+service Friends {
+  rpc AddFriend(EmptyRequest) returns (BasicResponse);
+}
+
+message Paging {
+  uint32 page_number = 1;
+  uint32 page_size = 2;
+  uint32 total = 3;
+}
+
+message EmptyRequest {}
+
+message BasicResponse {
+  int32 return_code = 1;
+  string return_message = 2;
+  int32 sub_return_code = 3;
+  string sub_return_message = 4;
+  string validated_message = 5;
+}
