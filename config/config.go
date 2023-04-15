@@ -9,13 +9,14 @@ import (
 )
 
 type AppConfig struct {
-	Server         ServerConfig          `mapstructure:"api"`
-	Logger         LoggerConfig          `mapstructure:"logger"`
-	Authentication *AuthenticationConfig `mapstructure:"authentication"`
-	Database       *DatabaseConfig       `mapstructure:"database"`
-	Env            string                `mapstructure:"env"`
-	IsProduction   bool                  `mapstructure:"isProduction"`
-	Redis          *RedisConfig          `mapstructure:"redis"`
+	Server              ServerConfig          `mapstructure:"api"`
+	Logger              LoggerConfig          `mapstructure:"logger"`
+	Authentication      *AuthenticationConfig `mapstructure:"authentication"`
+	ChatAppDatabase     *DatabaseConfig       `mapstructure:"chatAppDatabase"`
+	ChatMessageDatabase *DatabaseConfig       `mapstructure:"chatMessageDatabase"`
+	Env                 string                `mapstructure:"env"`
+	IsProduction        bool                  `mapstructure:"isProduction"`
+	Redis               *RedisConfig          `mapstructure:"redis"`
 }
 
 type ServerConfig struct {

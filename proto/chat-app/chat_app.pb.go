@@ -204,6 +204,605 @@ func (x *BasicResponse) GetValidatedMessage() string {
 	return ""
 }
 
+type LoginRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	PhoneNumber string `protobuf:"bytes,1,opt,name=phone_number,json=phoneNumber,proto3" json:"phone_number,omitempty"`
+	Password    string `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
+}
+
+func (x *LoginRequest) Reset() {
+	*x = LoginRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_chat_app_chat_app_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *LoginRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LoginRequest) ProtoMessage() {}
+
+func (x *LoginRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_chat_app_chat_app_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LoginRequest.ProtoReflect.Descriptor instead.
+func (*LoginRequest) Descriptor() ([]byte, []int) {
+	return file_proto_chat_app_chat_app_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *LoginRequest) GetPhoneNumber() string {
+	if x != nil {
+		return x.PhoneNumber
+	}
+	return ""
+}
+
+func (x *LoginRequest) GetPassword() string {
+	if x != nil {
+		return x.Password
+	}
+	return ""
+}
+
+type LoginResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	ReturnCode       int32  `protobuf:"varint,1,opt,name=return_code,json=returnCode,proto3" json:"return_code,omitempty"`
+	ReturnMessage    string `protobuf:"bytes,2,opt,name=return_message,json=returnMessage,proto3" json:"return_message,omitempty"`
+	SubReturnCode    int32  `protobuf:"varint,3,opt,name=sub_return_code,json=subReturnCode,proto3" json:"sub_return_code,omitempty"`
+	SubReturnMessage string `protobuf:"bytes,4,opt,name=sub_return_message,json=subReturnMessage,proto3" json:"sub_return_message,omitempty"`
+	AccessToken      string `protobuf:"bytes,5,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
+	UserId           string `protobuf:"bytes,6,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+}
+
+func (x *LoginResponse) Reset() {
+	*x = LoginResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_chat_app_chat_app_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *LoginResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LoginResponse) ProtoMessage() {}
+
+func (x *LoginResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_chat_app_chat_app_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LoginResponse.ProtoReflect.Descriptor instead.
+func (*LoginResponse) Descriptor() ([]byte, []int) {
+	return file_proto_chat_app_chat_app_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *LoginResponse) GetReturnCode() int32 {
+	if x != nil {
+		return x.ReturnCode
+	}
+	return 0
+}
+
+func (x *LoginResponse) GetReturnMessage() string {
+	if x != nil {
+		return x.ReturnMessage
+	}
+	return ""
+}
+
+func (x *LoginResponse) GetSubReturnCode() int32 {
+	if x != nil {
+		return x.SubReturnCode
+	}
+	return 0
+}
+
+func (x *LoginResponse) GetSubReturnMessage() string {
+	if x != nil {
+		return x.SubReturnMessage
+	}
+	return ""
+}
+
+func (x *LoginResponse) GetAccessToken() string {
+	if x != nil {
+		return x.AccessToken
+	}
+	return ""
+}
+
+func (x *LoginResponse) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+type RegisterRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	PhoneNumber string `protobuf:"bytes,1,opt,name=phone_number,json=phoneNumber,proto3" json:"phone_number,omitempty"`
+	Password    string `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
+}
+
+func (x *RegisterRequest) Reset() {
+	*x = RegisterRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_chat_app_chat_app_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *RegisterRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RegisterRequest) ProtoMessage() {}
+
+func (x *RegisterRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_chat_app_chat_app_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RegisterRequest.ProtoReflect.Descriptor instead.
+func (*RegisterRequest) Descriptor() ([]byte, []int) {
+	return file_proto_chat_app_chat_app_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *RegisterRequest) GetPhoneNumber() string {
+	if x != nil {
+		return x.PhoneNumber
+	}
+	return ""
+}
+
+func (x *RegisterRequest) GetPassword() string {
+	if x != nil {
+		return x.Password
+	}
+	return ""
+}
+
+type ChatMessage struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	SenderId    string `protobuf:"bytes,1,opt,name=sender_id,json=senderId,proto3" json:"sender_id,omitempty"`
+	RecipientId string `protobuf:"bytes,2,opt,name=recipient_id,json=recipientId,proto3" json:"recipient_id,omitempty"`
+	Message     string `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
+	Time        string `protobuf:"bytes,4,opt,name=time,proto3" json:"time,omitempty"`
+}
+
+func (x *ChatMessage) Reset() {
+	*x = ChatMessage{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_chat_app_chat_app_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ChatMessage) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ChatMessage) ProtoMessage() {}
+
+func (x *ChatMessage) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_chat_app_chat_app_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ChatMessage.ProtoReflect.Descriptor instead.
+func (*ChatMessage) Descriptor() ([]byte, []int) {
+	return file_proto_chat_app_chat_app_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *ChatMessage) GetSenderId() string {
+	if x != nil {
+		return x.SenderId
+	}
+	return ""
+}
+
+func (x *ChatMessage) GetRecipientId() string {
+	if x != nil {
+		return x.RecipientId
+	}
+	return ""
+}
+
+func (x *ChatMessage) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *ChatMessage) GetTime() string {
+	if x != nil {
+		return x.Time
+	}
+	return ""
+}
+
+type ChatHistoryRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	SenderId    string `protobuf:"bytes,1,opt,name=sender_id,json=senderId,proto3" json:"sender_id,omitempty"`
+	RecipientId string `protobuf:"bytes,2,opt,name=recipient_id,json=recipientId,proto3" json:"recipient_id,omitempty"`
+}
+
+func (x *ChatHistoryRequest) Reset() {
+	*x = ChatHistoryRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_chat_app_chat_app_proto_msgTypes[7]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ChatHistoryRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ChatHistoryRequest) ProtoMessage() {}
+
+func (x *ChatHistoryRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_chat_app_chat_app_proto_msgTypes[7]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ChatHistoryRequest.ProtoReflect.Descriptor instead.
+func (*ChatHistoryRequest) Descriptor() ([]byte, []int) {
+	return file_proto_chat_app_chat_app_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *ChatHistoryRequest) GetSenderId() string {
+	if x != nil {
+		return x.SenderId
+	}
+	return ""
+}
+
+func (x *ChatHistoryRequest) GetRecipientId() string {
+	if x != nil {
+		return x.RecipientId
+	}
+	return ""
+}
+
+type ChatHistoryResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	ReturnCode       int32          `protobuf:"varint,1,opt,name=return_code,json=returnCode,proto3" json:"return_code,omitempty"`
+	ReturnMessage    string         `protobuf:"bytes,2,opt,name=return_message,json=returnMessage,proto3" json:"return_message,omitempty"`
+	SubReturnCode    int32          `protobuf:"varint,3,opt,name=sub_return_code,json=subReturnCode,proto3" json:"sub_return_code,omitempty"`
+	SubReturnMessage string         `protobuf:"bytes,4,opt,name=sub_return_message,json=subReturnMessage,proto3" json:"sub_return_message,omitempty"`
+	ChatHistory      []*ChatMessage `protobuf:"bytes,5,rep,name=chat_history,json=chatHistory,proto3" json:"chat_history,omitempty"`
+	Paging           *Paging        `protobuf:"bytes,6,opt,name=paging,proto3" json:"paging,omitempty"`
+}
+
+func (x *ChatHistoryResponse) Reset() {
+	*x = ChatHistoryResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_chat_app_chat_app_proto_msgTypes[8]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ChatHistoryResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ChatHistoryResponse) ProtoMessage() {}
+
+func (x *ChatHistoryResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_chat_app_chat_app_proto_msgTypes[8]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ChatHistoryResponse.ProtoReflect.Descriptor instead.
+func (*ChatHistoryResponse) Descriptor() ([]byte, []int) {
+	return file_proto_chat_app_chat_app_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *ChatHistoryResponse) GetReturnCode() int32 {
+	if x != nil {
+		return x.ReturnCode
+	}
+	return 0
+}
+
+func (x *ChatHistoryResponse) GetReturnMessage() string {
+	if x != nil {
+		return x.ReturnMessage
+	}
+	return ""
+}
+
+func (x *ChatHistoryResponse) GetSubReturnCode() int32 {
+	if x != nil {
+		return x.SubReturnCode
+	}
+	return 0
+}
+
+func (x *ChatHistoryResponse) GetSubReturnMessage() string {
+	if x != nil {
+		return x.SubReturnMessage
+	}
+	return ""
+}
+
+func (x *ChatHistoryResponse) GetChatHistory() []*ChatMessage {
+	if x != nil {
+		return x.ChatHistory
+	}
+	return nil
+}
+
+func (x *ChatHistoryResponse) GetPaging() *Paging {
+	if x != nil {
+		return x.Paging
+	}
+	return nil
+}
+
+type UserDetail struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Username string `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
+	UserId   string `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Online   bool   `protobuf:"varint,3,opt,name=online,proto3" json:"online,omitempty"`
+}
+
+func (x *UserDetail) Reset() {
+	*x = UserDetail{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_chat_app_chat_app_proto_msgTypes[9]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UserDetail) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserDetail) ProtoMessage() {}
+
+func (x *UserDetail) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_chat_app_chat_app_proto_msgTypes[9]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserDetail.ProtoReflect.Descriptor instead.
+func (*UserDetail) Descriptor() ([]byte, []int) {
+	return file_proto_chat_app_chat_app_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *UserDetail) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+func (x *UserDetail) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *UserDetail) GetOnline() bool {
+	if x != nil {
+		return x.Online
+	}
+	return false
+}
+
+type UserDetailRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	UserId string `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+}
+
+func (x *UserDetailRequest) Reset() {
+	*x = UserDetailRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_chat_app_chat_app_proto_msgTypes[10]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UserDetailRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserDetailRequest) ProtoMessage() {}
+
+func (x *UserDetailRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_chat_app_chat_app_proto_msgTypes[10]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserDetailRequest.ProtoReflect.Descriptor instead.
+func (*UserDetailRequest) Descriptor() ([]byte, []int) {
+	return file_proto_chat_app_chat_app_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *UserDetailRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+type UserDetailResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	ReturnCode       int32       `protobuf:"varint,1,opt,name=return_code,json=returnCode,proto3" json:"return_code,omitempty"`
+	ReturnMessage    string      `protobuf:"bytes,2,opt,name=return_message,json=returnMessage,proto3" json:"return_message,omitempty"`
+	SubReturnCode    int32       `protobuf:"varint,3,opt,name=sub_return_code,json=subReturnCode,proto3" json:"sub_return_code,omitempty"`
+	SubReturnMessage string      `protobuf:"bytes,4,opt,name=sub_return_message,json=subReturnMessage,proto3" json:"sub_return_message,omitempty"`
+	UserDetail       *UserDetail `protobuf:"bytes,5,opt,name=user_detail,json=userDetail,proto3" json:"user_detail,omitempty"`
+}
+
+func (x *UserDetailResponse) Reset() {
+	*x = UserDetailResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_chat_app_chat_app_proto_msgTypes[11]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UserDetailResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserDetailResponse) ProtoMessage() {}
+
+func (x *UserDetailResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_chat_app_chat_app_proto_msgTypes[11]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserDetailResponse.ProtoReflect.Descriptor instead.
+func (*UserDetailResponse) Descriptor() ([]byte, []int) {
+	return file_proto_chat_app_chat_app_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *UserDetailResponse) GetReturnCode() int32 {
+	if x != nil {
+		return x.ReturnCode
+	}
+	return 0
+}
+
+func (x *UserDetailResponse) GetReturnMessage() string {
+	if x != nil {
+		return x.ReturnMessage
+	}
+	return ""
+}
+
+func (x *UserDetailResponse) GetSubReturnCode() int32 {
+	if x != nil {
+		return x.SubReturnCode
+	}
+	return 0
+}
+
+func (x *UserDetailResponse) GetSubReturnMessage() string {
+	if x != nil {
+		return x.SubReturnMessage
+	}
+	return ""
+}
+
+func (x *UserDetailResponse) GetUserDetail() *UserDetail {
+	if x != nil {
+		return x.UserDetail
+	}
+	return nil
+}
+
 var File_proto_chat_app_chat_app_proto protoreflect.FileDescriptor
 
 var file_proto_chat_app_chat_app_proto_rawDesc = []byte{
@@ -230,13 +829,111 @@ var file_proto_chat_app_chat_app_proto_rawDesc = []byte{
 	0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x12, 0x2b, 0x0a, 0x11, 0x76, 0x61, 0x6c, 0x69, 0x64,
 	0x61, 0x74, 0x65, 0x64, 0x5f, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x18, 0x05, 0x20, 0x01,
 	0x28, 0x09, 0x52, 0x10, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x65, 0x64, 0x4d, 0x65, 0x73,
-	0x73, 0x61, 0x67, 0x65, 0x32, 0x47, 0x0a, 0x07, 0x46, 0x72, 0x69, 0x65, 0x6e, 0x64, 0x73, 0x12,
-	0x3c, 0x0a, 0x09, 0x41, 0x64, 0x64, 0x46, 0x72, 0x69, 0x65, 0x6e, 0x64, 0x12, 0x16, 0x2e, 0x63,
-	0x68, 0x61, 0x74, 0x5f, 0x61, 0x70, 0x70, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x52, 0x65, 0x71,
-	0x75, 0x65, 0x73, 0x74, 0x1a, 0x17, 0x2e, 0x63, 0x68, 0x61, 0x74, 0x5f, 0x61, 0x70, 0x70, 0x2e,
-	0x42, 0x61, 0x73, 0x69, 0x63, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0x19, 0x5a,
-	0x17, 0x63, 0x68, 0x61, 0x74, 0x2d, 0x61, 0x70, 0x70, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f,
-	0x63, 0x68, 0x61, 0x74, 0x2d, 0x61, 0x70, 0x70, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x73, 0x61, 0x67, 0x65, 0x22, 0x4d, 0x0a, 0x0c, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x12, 0x21, 0x0a, 0x0c, 0x70, 0x68, 0x6f, 0x6e, 0x65, 0x5f, 0x6e, 0x75,
+	0x6d, 0x62, 0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x70, 0x68, 0x6f, 0x6e,
+	0x65, 0x4e, 0x75, 0x6d, 0x62, 0x65, 0x72, 0x12, 0x1a, 0x0a, 0x08, 0x70, 0x61, 0x73, 0x73, 0x77,
+	0x6f, 0x72, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x70, 0x61, 0x73, 0x73, 0x77,
+	0x6f, 0x72, 0x64, 0x22, 0xe9, 0x01, 0x0a, 0x0d, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x52, 0x65, 0x73,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x1f, 0x0a, 0x0b, 0x72, 0x65, 0x74, 0x75, 0x72, 0x6e, 0x5f,
+	0x63, 0x6f, 0x64, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x0a, 0x72, 0x65, 0x74, 0x75,
+	0x72, 0x6e, 0x43, 0x6f, 0x64, 0x65, 0x12, 0x25, 0x0a, 0x0e, 0x72, 0x65, 0x74, 0x75, 0x72, 0x6e,
+	0x5f, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0d,
+	0x72, 0x65, 0x74, 0x75, 0x72, 0x6e, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x12, 0x26, 0x0a,
+	0x0f, 0x73, 0x75, 0x62, 0x5f, 0x72, 0x65, 0x74, 0x75, 0x72, 0x6e, 0x5f, 0x63, 0x6f, 0x64, 0x65,
+	0x18, 0x03, 0x20, 0x01, 0x28, 0x05, 0x52, 0x0d, 0x73, 0x75, 0x62, 0x52, 0x65, 0x74, 0x75, 0x72,
+	0x6e, 0x43, 0x6f, 0x64, 0x65, 0x12, 0x2c, 0x0a, 0x12, 0x73, 0x75, 0x62, 0x5f, 0x72, 0x65, 0x74,
+	0x75, 0x72, 0x6e, 0x5f, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x10, 0x73, 0x75, 0x62, 0x52, 0x65, 0x74, 0x75, 0x72, 0x6e, 0x4d, 0x65, 0x73, 0x73,
+	0x61, 0x67, 0x65, 0x12, 0x21, 0x0a, 0x0c, 0x61, 0x63, 0x63, 0x65, 0x73, 0x73, 0x5f, 0x74, 0x6f,
+	0x6b, 0x65, 0x6e, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x61, 0x63, 0x63, 0x65, 0x73,
+	0x73, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x12, 0x17, 0x0a, 0x07, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x69,
+	0x64, 0x18, 0x06, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x22,
+	0x50, 0x0a, 0x0f, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x12, 0x21, 0x0a, 0x0c, 0x70, 0x68, 0x6f, 0x6e, 0x65, 0x5f, 0x6e, 0x75, 0x6d, 0x62,
+	0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x70, 0x68, 0x6f, 0x6e, 0x65, 0x4e,
+	0x75, 0x6d, 0x62, 0x65, 0x72, 0x12, 0x1a, 0x0a, 0x08, 0x70, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72,
+	0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x70, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72,
+	0x64, 0x22, 0x7b, 0x0a, 0x0b, 0x43, 0x68, 0x61, 0x74, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65,
+	0x12, 0x1b, 0x0a, 0x09, 0x73, 0x65, 0x6e, 0x64, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x08, 0x73, 0x65, 0x6e, 0x64, 0x65, 0x72, 0x49, 0x64, 0x12, 0x21, 0x0a,
+	0x0c, 0x72, 0x65, 0x63, 0x69, 0x70, 0x69, 0x65, 0x6e, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x0b, 0x72, 0x65, 0x63, 0x69, 0x70, 0x69, 0x65, 0x6e, 0x74, 0x49, 0x64,
+	0x12, 0x18, 0x0a, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x74, 0x69,
+	0x6d, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x74, 0x69, 0x6d, 0x65, 0x22, 0x54,
+	0x0a, 0x12, 0x43, 0x68, 0x61, 0x74, 0x48, 0x69, 0x73, 0x74, 0x6f, 0x72, 0x79, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x12, 0x1b, 0x0a, 0x09, 0x73, 0x65, 0x6e, 0x64, 0x65, 0x72, 0x5f, 0x69,
+	0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x73, 0x65, 0x6e, 0x64, 0x65, 0x72, 0x49,
+	0x64, 0x12, 0x21, 0x0a, 0x0c, 0x72, 0x65, 0x63, 0x69, 0x70, 0x69, 0x65, 0x6e, 0x74, 0x5f, 0x69,
+	0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x72, 0x65, 0x63, 0x69, 0x70, 0x69, 0x65,
+	0x6e, 0x74, 0x49, 0x64, 0x22, 0x97, 0x02, 0x0a, 0x13, 0x43, 0x68, 0x61, 0x74, 0x48, 0x69, 0x73,
+	0x74, 0x6f, 0x72, 0x79, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x1f, 0x0a, 0x0b,
+	0x72, 0x65, 0x74, 0x75, 0x72, 0x6e, 0x5f, 0x63, 0x6f, 0x64, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x05, 0x52, 0x0a, 0x72, 0x65, 0x74, 0x75, 0x72, 0x6e, 0x43, 0x6f, 0x64, 0x65, 0x12, 0x25, 0x0a,
+	0x0e, 0x72, 0x65, 0x74, 0x75, 0x72, 0x6e, 0x5f, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0d, 0x72, 0x65, 0x74, 0x75, 0x72, 0x6e, 0x4d, 0x65, 0x73,
+	0x73, 0x61, 0x67, 0x65, 0x12, 0x26, 0x0a, 0x0f, 0x73, 0x75, 0x62, 0x5f, 0x72, 0x65, 0x74, 0x75,
+	0x72, 0x6e, 0x5f, 0x63, 0x6f, 0x64, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x05, 0x52, 0x0d, 0x73,
+	0x75, 0x62, 0x52, 0x65, 0x74, 0x75, 0x72, 0x6e, 0x43, 0x6f, 0x64, 0x65, 0x12, 0x2c, 0x0a, 0x12,
+	0x73, 0x75, 0x62, 0x5f, 0x72, 0x65, 0x74, 0x75, 0x72, 0x6e, 0x5f, 0x6d, 0x65, 0x73, 0x73, 0x61,
+	0x67, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x10, 0x73, 0x75, 0x62, 0x52, 0x65, 0x74,
+	0x75, 0x72, 0x6e, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x12, 0x38, 0x0a, 0x0c, 0x63, 0x68,
+	0x61, 0x74, 0x5f, 0x68, 0x69, 0x73, 0x74, 0x6f, 0x72, 0x79, 0x18, 0x05, 0x20, 0x03, 0x28, 0x0b,
+	0x32, 0x15, 0x2e, 0x63, 0x68, 0x61, 0x74, 0x5f, 0x61, 0x70, 0x70, 0x2e, 0x43, 0x68, 0x61, 0x74,
+	0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x52, 0x0b, 0x63, 0x68, 0x61, 0x74, 0x48, 0x69, 0x73,
+	0x74, 0x6f, 0x72, 0x79, 0x12, 0x28, 0x0a, 0x06, 0x70, 0x61, 0x67, 0x69, 0x6e, 0x67, 0x18, 0x06,
+	0x20, 0x01, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x63, 0x68, 0x61, 0x74, 0x5f, 0x61, 0x70, 0x70, 0x2e,
+	0x50, 0x61, 0x67, 0x69, 0x6e, 0x67, 0x52, 0x06, 0x70, 0x61, 0x67, 0x69, 0x6e, 0x67, 0x22, 0x59,
+	0x0a, 0x0a, 0x55, 0x73, 0x65, 0x72, 0x44, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x12, 0x1a, 0x0a, 0x08,
+	0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08,
+	0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x17, 0x0a, 0x07, 0x75, 0x73, 0x65, 0x72,
+	0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49,
+	0x64, 0x12, 0x16, 0x0a, 0x06, 0x6f, 0x6e, 0x6c, 0x69, 0x6e, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28,
+	0x08, 0x52, 0x06, 0x6f, 0x6e, 0x6c, 0x69, 0x6e, 0x65, 0x22, 0x2c, 0x0a, 0x11, 0x55, 0x73, 0x65,
+	0x72, 0x44, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x17,
+	0x0a, 0x07, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x22, 0xe9, 0x01, 0x0a, 0x12, 0x55, 0x73, 0x65, 0x72,
+	0x44, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x1f,
+	0x0a, 0x0b, 0x72, 0x65, 0x74, 0x75, 0x72, 0x6e, 0x5f, 0x63, 0x6f, 0x64, 0x65, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x05, 0x52, 0x0a, 0x72, 0x65, 0x74, 0x75, 0x72, 0x6e, 0x43, 0x6f, 0x64, 0x65, 0x12,
+	0x25, 0x0a, 0x0e, 0x72, 0x65, 0x74, 0x75, 0x72, 0x6e, 0x5f, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67,
+	0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0d, 0x72, 0x65, 0x74, 0x75, 0x72, 0x6e, 0x4d,
+	0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x12, 0x26, 0x0a, 0x0f, 0x73, 0x75, 0x62, 0x5f, 0x72, 0x65,
+	0x74, 0x75, 0x72, 0x6e, 0x5f, 0x63, 0x6f, 0x64, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x05, 0x52,
+	0x0d, 0x73, 0x75, 0x62, 0x52, 0x65, 0x74, 0x75, 0x72, 0x6e, 0x43, 0x6f, 0x64, 0x65, 0x12, 0x2c,
+	0x0a, 0x12, 0x73, 0x75, 0x62, 0x5f, 0x72, 0x65, 0x74, 0x75, 0x72, 0x6e, 0x5f, 0x6d, 0x65, 0x73,
+	0x73, 0x61, 0x67, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x10, 0x73, 0x75, 0x62, 0x52,
+	0x65, 0x74, 0x75, 0x72, 0x6e, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x12, 0x35, 0x0a, 0x0b,
+	0x75, 0x73, 0x65, 0x72, 0x5f, 0x64, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x18, 0x05, 0x20, 0x01, 0x28,
+	0x0b, 0x32, 0x14, 0x2e, 0x63, 0x68, 0x61, 0x74, 0x5f, 0x61, 0x70, 0x70, 0x2e, 0x55, 0x73, 0x65,
+	0x72, 0x44, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x52, 0x0a, 0x75, 0x73, 0x65, 0x72, 0x44, 0x65, 0x74,
+	0x61, 0x69, 0x6c, 0x32, 0x47, 0x0a, 0x07, 0x46, 0x72, 0x69, 0x65, 0x6e, 0x64, 0x73, 0x12, 0x3c,
+	0x0a, 0x09, 0x41, 0x64, 0x64, 0x46, 0x72, 0x69, 0x65, 0x6e, 0x64, 0x12, 0x16, 0x2e, 0x63, 0x68,
+	0x61, 0x74, 0x5f, 0x61, 0x70, 0x70, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x1a, 0x17, 0x2e, 0x63, 0x68, 0x61, 0x74, 0x5f, 0x61, 0x70, 0x70, 0x2e, 0x42,
+	0x61, 0x73, 0x69, 0x63, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x32, 0x80, 0x01, 0x0a,
+	0x04, 0x41, 0x75, 0x74, 0x68, 0x12, 0x38, 0x0a, 0x05, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x12, 0x16,
+	0x2e, 0x63, 0x68, 0x61, 0x74, 0x5f, 0x61, 0x70, 0x70, 0x2e, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x52,
+	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x17, 0x2e, 0x63, 0x68, 0x61, 0x74, 0x5f, 0x61, 0x70,
+	0x70, 0x2e, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
+	0x3e, 0x0a, 0x08, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x12, 0x19, 0x2e, 0x63, 0x68,
+	0x61, 0x74, 0x5f, 0x61, 0x70, 0x70, 0x2e, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x52,
+	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x17, 0x2e, 0x63, 0x68, 0x61, 0x74, 0x5f, 0x61, 0x70,
+	0x70, 0x2e, 0x42, 0x61, 0x73, 0x69, 0x63, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x32,
+	0x55, 0x0a, 0x04, 0x43, 0x68, 0x61, 0x74, 0x12, 0x4d, 0x0a, 0x0e, 0x47, 0x65, 0x74, 0x43, 0x68,
+	0x61, 0x74, 0x48, 0x69, 0x73, 0x74, 0x6f, 0x72, 0x79, 0x12, 0x1c, 0x2e, 0x63, 0x68, 0x61, 0x74,
+	0x5f, 0x61, 0x70, 0x70, 0x2e, 0x43, 0x68, 0x61, 0x74, 0x48, 0x69, 0x73, 0x74, 0x6f, 0x72, 0x79,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1d, 0x2e, 0x63, 0x68, 0x61, 0x74, 0x5f, 0x61,
+	0x70, 0x70, 0x2e, 0x43, 0x68, 0x61, 0x74, 0x48, 0x69, 0x73, 0x74, 0x6f, 0x72, 0x79, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x32, 0x52, 0x0a, 0x04, 0x55, 0x73, 0x65, 0x72, 0x12, 0x4a,
+	0x0a, 0x0d, 0x47, 0x65, 0x74, 0x55, 0x73, 0x65, 0x72, 0x44, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x12,
+	0x1b, 0x2e, 0x63, 0x68, 0x61, 0x74, 0x5f, 0x61, 0x70, 0x70, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x44,
+	0x65, 0x74, 0x61, 0x69, 0x6c, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1c, 0x2e, 0x63,
+	0x68, 0x61, 0x74, 0x5f, 0x61, 0x70, 0x70, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x44, 0x65, 0x74, 0x61,
+	0x69, 0x6c, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0x19, 0x5a, 0x17, 0x63, 0x68,
+	0x61, 0x74, 0x2d, 0x61, 0x70, 0x70, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x63, 0x68, 0x61,
+	0x74, 0x2d, 0x61, 0x70, 0x70, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -251,20 +948,40 @@ func file_proto_chat_app_chat_app_proto_rawDescGZIP() []byte {
 	return file_proto_chat_app_chat_app_proto_rawDescData
 }
 
-var file_proto_chat_app_chat_app_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_proto_chat_app_chat_app_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_proto_chat_app_chat_app_proto_goTypes = []interface{}{
-	(*Paging)(nil),        // 0: chat_app.Paging
-	(*EmptyRequest)(nil),  // 1: chat_app.EmptyRequest
-	(*BasicResponse)(nil), // 2: chat_app.BasicResponse
+	(*Paging)(nil),              // 0: chat_app.Paging
+	(*EmptyRequest)(nil),        // 1: chat_app.EmptyRequest
+	(*BasicResponse)(nil),       // 2: chat_app.BasicResponse
+	(*LoginRequest)(nil),        // 3: chat_app.LoginRequest
+	(*LoginResponse)(nil),       // 4: chat_app.LoginResponse
+	(*RegisterRequest)(nil),     // 5: chat_app.RegisterRequest
+	(*ChatMessage)(nil),         // 6: chat_app.ChatMessage
+	(*ChatHistoryRequest)(nil),  // 7: chat_app.ChatHistoryRequest
+	(*ChatHistoryResponse)(nil), // 8: chat_app.ChatHistoryResponse
+	(*UserDetail)(nil),          // 9: chat_app.UserDetail
+	(*UserDetailRequest)(nil),   // 10: chat_app.UserDetailRequest
+	(*UserDetailResponse)(nil),  // 11: chat_app.UserDetailResponse
 }
 var file_proto_chat_app_chat_app_proto_depIdxs = []int32{
-	1, // 0: chat_app.Friends.AddFriend:input_type -> chat_app.EmptyRequest
-	2, // 1: chat_app.Friends.AddFriend:output_type -> chat_app.BasicResponse
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	6,  // 0: chat_app.ChatHistoryResponse.chat_history:type_name -> chat_app.ChatMessage
+	0,  // 1: chat_app.ChatHistoryResponse.paging:type_name -> chat_app.Paging
+	9,  // 2: chat_app.UserDetailResponse.user_detail:type_name -> chat_app.UserDetail
+	1,  // 3: chat_app.Friends.AddFriend:input_type -> chat_app.EmptyRequest
+	3,  // 4: chat_app.Auth.Login:input_type -> chat_app.LoginRequest
+	5,  // 5: chat_app.Auth.Register:input_type -> chat_app.RegisterRequest
+	7,  // 6: chat_app.Chat.GetChatHistory:input_type -> chat_app.ChatHistoryRequest
+	10, // 7: chat_app.User.GetUserDetail:input_type -> chat_app.UserDetailRequest
+	2,  // 8: chat_app.Friends.AddFriend:output_type -> chat_app.BasicResponse
+	4,  // 9: chat_app.Auth.Login:output_type -> chat_app.LoginResponse
+	2,  // 10: chat_app.Auth.Register:output_type -> chat_app.BasicResponse
+	8,  // 11: chat_app.Chat.GetChatHistory:output_type -> chat_app.ChatHistoryResponse
+	11, // 12: chat_app.User.GetUserDetail:output_type -> chat_app.UserDetailResponse
+	8,  // [8:13] is the sub-list for method output_type
+	3,  // [3:8] is the sub-list for method input_type
+	3,  // [3:3] is the sub-list for extension type_name
+	3,  // [3:3] is the sub-list for extension extendee
+	0,  // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_proto_chat_app_chat_app_proto_init() }
@@ -309,6 +1026,114 @@ func file_proto_chat_app_chat_app_proto_init() {
 				return nil
 			}
 		}
+		file_proto_chat_app_chat_app_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*LoginRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_chat_app_chat_app_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*LoginResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_chat_app_chat_app_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*RegisterRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_chat_app_chat_app_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ChatMessage); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_chat_app_chat_app_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ChatHistoryRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_chat_app_chat_app_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ChatHistoryResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_chat_app_chat_app_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UserDetail); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_chat_app_chat_app_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UserDetailRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_chat_app_chat_app_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UserDetailResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -316,9 +1141,9 @@ func file_proto_chat_app_chat_app_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_proto_chat_app_chat_app_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   12,
 			NumExtensions: 0,
-			NumServices:   1,
+			NumServices:   4,
 		},
 		GoTypes:           file_proto_chat_app_chat_app_proto_goTypes,
 		DependencyIndexes: file_proto_chat_app_chat_app_proto_depIdxs,
@@ -404,6 +1229,258 @@ var _Friends_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AddFriend",
 			Handler:    _Friends_AddFriend_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "proto/chat-app/chat_app.proto",
+}
+
+// AuthClient is the client API for Auth service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
+type AuthClient interface {
+	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
+	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*BasicResponse, error)
+}
+
+type authClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewAuthClient(cc grpc.ClientConnInterface) AuthClient {
+	return &authClient{cc}
+}
+
+func (c *authClient) Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
+	out := new(LoginResponse)
+	err := c.cc.Invoke(ctx, "/chat_app.Auth/Login", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authClient) Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*BasicResponse, error) {
+	out := new(BasicResponse)
+	err := c.cc.Invoke(ctx, "/chat_app.Auth/Register", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// AuthServer is the server API for Auth service.
+type AuthServer interface {
+	Login(context.Context, *LoginRequest) (*LoginResponse, error)
+	Register(context.Context, *RegisterRequest) (*BasicResponse, error)
+}
+
+// UnimplementedAuthServer can be embedded to have forward compatible implementations.
+type UnimplementedAuthServer struct {
+}
+
+func (*UnimplementedAuthServer) Login(context.Context, *LoginRequest) (*LoginResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
+}
+func (*UnimplementedAuthServer) Register(context.Context, *RegisterRequest) (*BasicResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
+}
+
+func RegisterAuthServer(s *grpc.Server, srv AuthServer) {
+	s.RegisterService(&_Auth_serviceDesc, srv)
+}
+
+func _Auth_Login_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LoginRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServer).Login(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/chat_app.Auth/Login",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServer).Login(ctx, req.(*LoginRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Auth_Register_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegisterRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServer).Register(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/chat_app.Auth/Register",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServer).Register(ctx, req.(*RegisterRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+var _Auth_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "chat_app.Auth",
+	HandlerType: (*AuthServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Login",
+			Handler:    _Auth_Login_Handler,
+		},
+		{
+			MethodName: "Register",
+			Handler:    _Auth_Register_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "proto/chat-app/chat_app.proto",
+}
+
+// ChatClient is the client API for Chat service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
+type ChatClient interface {
+	GetChatHistory(ctx context.Context, in *ChatHistoryRequest, opts ...grpc.CallOption) (*ChatHistoryResponse, error)
+}
+
+type chatClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewChatClient(cc grpc.ClientConnInterface) ChatClient {
+	return &chatClient{cc}
+}
+
+func (c *chatClient) GetChatHistory(ctx context.Context, in *ChatHistoryRequest, opts ...grpc.CallOption) (*ChatHistoryResponse, error) {
+	out := new(ChatHistoryResponse)
+	err := c.cc.Invoke(ctx, "/chat_app.Chat/GetChatHistory", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// ChatServer is the server API for Chat service.
+type ChatServer interface {
+	GetChatHistory(context.Context, *ChatHistoryRequest) (*ChatHistoryResponse, error)
+}
+
+// UnimplementedChatServer can be embedded to have forward compatible implementations.
+type UnimplementedChatServer struct {
+}
+
+func (*UnimplementedChatServer) GetChatHistory(context.Context, *ChatHistoryRequest) (*ChatHistoryResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetChatHistory not implemented")
+}
+
+func RegisterChatServer(s *grpc.Server, srv ChatServer) {
+	s.RegisterService(&_Chat_serviceDesc, srv)
+}
+
+func _Chat_GetChatHistory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ChatHistoryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ChatServer).GetChatHistory(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/chat_app.Chat/GetChatHistory",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ChatServer).GetChatHistory(ctx, req.(*ChatHistoryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+var _Chat_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "chat_app.Chat",
+	HandlerType: (*ChatServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetChatHistory",
+			Handler:    _Chat_GetChatHistory_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "proto/chat-app/chat_app.proto",
+}
+
+// UserClient is the client API for User service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
+type UserClient interface {
+	GetUserDetail(ctx context.Context, in *UserDetailRequest, opts ...grpc.CallOption) (*UserDetailResponse, error)
+}
+
+type userClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewUserClient(cc grpc.ClientConnInterface) UserClient {
+	return &userClient{cc}
+}
+
+func (c *userClient) GetUserDetail(ctx context.Context, in *UserDetailRequest, opts ...grpc.CallOption) (*UserDetailResponse, error) {
+	out := new(UserDetailResponse)
+	err := c.cc.Invoke(ctx, "/chat_app.User/GetUserDetail", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// UserServer is the server API for User service.
+type UserServer interface {
+	GetUserDetail(context.Context, *UserDetailRequest) (*UserDetailResponse, error)
+}
+
+// UnimplementedUserServer can be embedded to have forward compatible implementations.
+type UnimplementedUserServer struct {
+}
+
+func (*UnimplementedUserServer) GetUserDetail(context.Context, *UserDetailRequest) (*UserDetailResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserDetail not implemented")
+}
+
+func RegisterUserServer(s *grpc.Server, srv UserServer) {
+	s.RegisterService(&_User_serviceDesc, srv)
+}
+
+func _User_GetUserDetail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserDetailRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).GetUserDetail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/chat_app.User/GetUserDetail",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).GetUserDetail(ctx, req.(*UserDetailRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+var _User_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "chat_app.User",
+	HandlerType: (*UserServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetUserDetail",
+			Handler:    _User_GetUserDetail_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

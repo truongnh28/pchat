@@ -6,6 +6,19 @@ service Friends {
   rpc AddFriend(EmptyRequest) returns (BasicResponse);
 }
 
+service Auth {
+  rpc Login(LoginRequest) returns (LoginResponse);
+  rpc Register(RegisterRequest) returns (BasicResponse);
+}
+
+service Chat {
+  rpc GetChatHistory(ChatHistoryRequest) returns (ChatHistoryResponse);
+}
+
+service User {
+  rpc GetUserDetail(UserDetailRequest) returns (UserDetailResponse);
+}
+
 message Paging {
   uint32 page_number = 1;
   uint32 page_size = 2;
@@ -20,4 +33,62 @@ message BasicResponse {
   int32 sub_return_code = 3;
   string sub_return_message = 4;
   string validated_message = 5;
+}
+
+message LoginRequest {
+  string phone_number = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  int32 return_code = 1;
+  string return_message = 2;
+  int32 sub_return_code = 3;
+  string sub_return_message = 4;
+  string access_token = 5;
+  string user_id = 6;
+}
+
+message RegisterRequest {
+  string phone_number = 1;
+  string password = 2;
+}
+
+message ChatMessage {
+  string sender_id = 1;
+  string recipient_id = 2;
+  string message = 3;
+  string time = 4;
+}
+
+message ChatHistoryRequest{
+  string sender_id = 1;
+  string recipient_id = 2;
+}
+
+message ChatHistoryResponse{
+  int32 return_code = 1;
+  string return_message = 2;
+  int32 sub_return_code = 3;
+  string sub_return_message = 4;
+  repeated ChatMessage chat_history = 5;
+  Paging paging = 6;
+}
+
+message UserDetail {
+  string username = 1;
+  string user_id = 2;
+  bool online = 3;
+}
+
+message UserDetailRequest {
+  string user_id = 1;
+}
+
+message UserDetailResponse {
+  int32 return_code = 1;
+  string return_message = 2;
+  int32 sub_return_code = 3;
+  string sub_return_message = 4;
+  UserDetail user_detail =  5;
 }

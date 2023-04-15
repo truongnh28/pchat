@@ -2,6 +2,9 @@ package server
 
 import (
 	"chat-app/config"
+	"chat-app/internal/controller"
+	"chat-app/internal/service"
+	"chat-app/pkg/repositories"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/whatvn/denny"
@@ -28,7 +31,7 @@ func (_ *HTTPServer) Run() error {
 }
 
 func initAuthentication() {
-	//TODO:handle auth
+	//TODO: handle auth
 }
 
 func setupHandler(s *denny.Denny) {
@@ -37,6 +40,24 @@ func setupHandler(s *denny.Denny) {
 
 	apiGroup := s.NewGroup("/api")
 	apiGroup.WithCors()
-
-	// apiGroup.BrpcController(controller.)
+	chatAppDB := repositories.InitChatAppDatabase()
+	chatMessageDB := repositories.InitChatMessageDatabase()
+	userRepo := repositories.NewUserRepository(chatAppDB)
+	messageRepo := repositories.NewMessageRepository(chatMessageDB)
+	messageService := service.NewMessageService(messageRepo)
+	apiGroup.BrpcController(
+		controller.NewMessage(
+			messageService,
+		),
+	)
+	apiGroup.BrpcController(
+		controller.NewMessage(
+			messageService,
+		),
+	)
+	apiGroup.BrpcController(
+		controller.NewUser(
+			userRepo,
+		),
+	)
 }
