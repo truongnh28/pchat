@@ -1,41 +1,41 @@
 version: '3.7'
 services:
-  chat-app-redis:
-    image: 'redis:alpine'
-    container_name: chat-app-redis
-    environment:
-      - ALLOW_EMPTY_PASSWORD=yes
-    ports:
-      - "6379:6379"
-    networks:
-      - chat-app-network
+  #  chat-app-redis:
+  #    image: 'redis:alpine'
+  #    container_name: chat-app-redis
+  #    environment:
+  #      - ALLOW_EMPTY_PASSWORD=yes
+  #    ports:
+  #      - "6379:6379"
+  #    networks:
+  #      - chat-app-network
   chat-app-db:
     container_name: chat-app-db
     image: mysql:8
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_ROOT_PASSWORD: 123456
       MYSQL_DATABASE: chat-app
     ports:
-      - "3306:3306"
+      - "3308:3306"
     networks:
       - chat-app-network
     volumes:
-      - ./db:/var/lib/mysql
+      - /var/lib/mysql/chat-app/db:/var/lib/mysql
   chat-message-db:
     container_name: chat-message-db
     image: mongo:latest
     restart: always
     environment:
-      MONGODB_INITDB_ROOT_USERNAME: root
-      MONGODB_INITDB_ROOT_PASSWORD: 1234
-      MYSQL_DATABASE: chat-app
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: 123456
+
     ports:
       - "27017:27017"
     networks:
       - chat-app-network
     volumes:
-      - ./db:/data/db
+      - /data/db/chat-message/db:/data/db
 #  chat-app-be:
 #    depends_on:
 #      - chat-app-db

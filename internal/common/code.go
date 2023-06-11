@@ -1,5 +1,9 @@
 package common
 
+import (
+	"fmt"
+)
+
 type ReturnCode int
 
 const (
@@ -54,3 +58,7 @@ func (r SubReturnCode) Message() string {
 func (r SubReturnCode) Int32() int32 {
 	return int32(r)
 }
+
+var (
+	NotFoundErr error = fmt.Errorf("not found")
+)

@@ -2,8 +2,10 @@ package server
 
 import (
 	"chat-app/config"
+	_const "chat-app/internal/const"
 	"chat-app/internal/controller"
 	"chat-app/internal/service"
+	"chat-app/internal/ws"
 	"chat-app/pkg/repositories"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -35,16 +37,26 @@ func initAuthentication() {
 }
 
 func setupHandler(s *denny.Denny) {
+	g := s.Engine
+
 	authGroup := s.NewGroup("/api")
 	authGroup.WithCors()
 
 	apiGroup := s.NewGroup("/api")
 	apiGroup.WithCors()
+	wsGroup := s.NewGroup("/ws")
+	wsGroup.WithCors()
+
 	chatAppDB := repositories.InitChatAppDatabase()
 	chatMessageDB := repositories.InitChatMessageDatabase()
 	userRepo := repositories.NewUserRepository(chatAppDB)
+	userService := service.NewUserService(userRepo)
 	messageRepo := repositories.NewMessageRepository(chatMessageDB)
 	messageService := service.NewMessageService(messageRepo)
+	accountRepo := repositories.NewAccountRepository(chatAppDB)
+	accountService := service.NewAccountService(accountRepo)
+	mailService := service.NewMailService(config.GetAppConfig().Mail, _const.MailTemplatePath)
+	//redisCli := redis.Client{}
 	apiGroup.BrpcController(
 		controller.NewMessage(
 			messageService,
@@ -57,7 +69,21 @@ func setupHandler(s *denny.Denny) {
 	)
 	apiGroup.BrpcController(
 		controller.NewUser(
-			userRepo,
+			userService,
 		),
 	)
+	apiGroup.BrpcController(
+		controller.NewAccount(
+			accountService,
+			mailService,
+		),
+	)
+
+	// Websockets Setup
+	hub := ws.NewHub(userService, messageService)
+	go hub.Run()
+
+	g.GET("/ws", func(c *gin.Context) {
+		ws.ServeWs(c, hub)
+	})
 }

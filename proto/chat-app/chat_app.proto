@@ -19,6 +19,60 @@ service User {
   rpc GetUserDetail(UserDetailRequest) returns (UserDetailResponse);
 }
 
+service Account {
+  rpc Create(CreateAccountRequest) returns (CreateAccountResponse);
+  rpc Get(GetAccountRequest) returns (GetAccountResponse);
+  rpc Update(UpdateAccountRequest) returns (BasicResponse);
+}
+
+message CreateAccountRequest {
+  string username = 1;
+  string phone_number = 2;
+  string email = 3;
+  string password = 4;
+}
+
+message AccountInfo {
+  string username = 1;
+  string phone_number = 2;
+  string email = 3;
+  string status = 4;
+}
+
+message CreateAccountResponse {
+  int32 return_code = 1;
+  string return_message = 2;
+  int32 sub_return_code = 3;
+  string sub_return_message = 4;
+  AccountInfo info = 5;
+}
+
+message GetAccountRequest {
+  optional string username = 1;
+  optional uint64 user_id = 2;
+}
+
+message GetAccountResponse {
+  int32 return_code = 1;
+  string return_message = 2;
+  int32 sub_return_code = 3;
+  string sub_return_message = 4;
+  AccountInfo info = 5;
+}
+
+message UpdateAccountRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message UpdateAccountResponse {
+  int32 return_code = 1;
+  string return_message = 2;
+  int32 sub_return_code = 3;
+  string sub_return_message = 4;
+  AccountInfo info = 5;
+}
+
 message Paging {
   uint32 page_number = 1;
   uint32 page_size = 2;
@@ -32,7 +86,6 @@ message BasicResponse {
   string return_message = 2;
   int32 sub_return_code = 3;
   string sub_return_message = 4;
-  string validated_message = 5;
 }
 
 message LoginRequest {
@@ -90,5 +143,5 @@ message UserDetailResponse {
   string return_message = 2;
   int32 sub_return_code = 3;
   string sub_return_message = 4;
-  UserDetail user_detail =  5;
+  UserDetail user_detail = 5;
 }

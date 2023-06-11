@@ -17,6 +17,7 @@ type AppConfig struct {
 	Env                 string                `mapstructure:"env"`
 	IsProduction        bool                  `mapstructure:"isProduction"`
 	Redis               *RedisConfig          `mapstructure:"redis"`
+	Mail                *MailConfig           `mapstructure:"mail"`
 }
 
 type ServerConfig struct {
@@ -45,6 +46,13 @@ type RedisConfig struct {
 	Host     string `mapstructure:"host"`
 	Port     int    `mapstructure:"port"`
 	Password string `mapstructure:"password"`
+}
+
+type MailConfig struct {
+	MailSender string `mapstructure:"mailSender,omitempty"`
+	Password   string `mapstructure:"password,omitempty"`
+	SmtpHost   string `mapstructure:"smtpHost,omitempty"`
+	SmtpPort   int    `mapstructure:"smtpPort,omitempty"`
 }
 
 var (
