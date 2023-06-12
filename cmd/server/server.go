@@ -6,6 +6,7 @@ import (
 	"chat-app/internal/controller"
 	"chat-app/internal/service"
 	"chat-app/internal/ws"
+	cache "chat-app/pkg/client/redis"
 	"chat-app/pkg/repositories"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -38,9 +39,6 @@ func initAuthentication() {
 func setupHandler(s *denny.Denny) {
 	g := s.Engine
 
-	authGroup := s.NewGroup("/api")
-	authGroup.WithCors()
-
 	apiGroup := s.NewGroup("/api")
 	apiGroup.WithCors()
 	wsGroup := s.NewGroup("/ws")
@@ -55,7 +53,21 @@ func setupHandler(s *denny.Denny) {
 	accountRepo := repositories.NewAccountRepository(chatAppDB)
 	accountService := service.NewAccountService(accountRepo)
 	mailService := service.NewMailService(config.GetAppConfig().Mail, _const.MailTemplatePath)
-
+	redisCli := cache.GetRedisClient(config.GetAppConfig().Redis)
+	authService := service.NewAuthenService(
+		service.GetJWTInstance(),
+		redisCli,
+		accountRepo,
+		config.GetAppConfig().Authentication,
+	)
+	apiGroup.BrpcController(
+		controller.NewAuth(
+			authService,
+			redisCli,
+			mailService,
+			config.GetAppConfig().Authentication,
+		),
+	)
 	apiGroup.BrpcController(
 		controller.NewMessage(
 			messageService,
@@ -71,6 +83,7 @@ func setupHandler(s *denny.Denny) {
 		controller.NewAccount(
 			accountService,
 			mailService,
+			redisCli,
 		),
 	)
 	// Websockets Setup

@@ -53,10 +53,10 @@ func (m *mailImpl) SendOpt(receiver []string, opt string) error {
 		return err
 	}
 	var mail = gomail.NewMessage()
-	mail.SetHeader("From", "truongvippro659@gmail.com")
+	mail.SetHeader("From", mailSender)
 	mail.SetHeader("To", receiver...)
 	// m.SetAddressHeader("Cc", "<RECIPIENT CC>", "<RECIPIENT CC NAME>")
-	mail.SetHeader("Subject", "PTIT Spotify OTP")
+	mail.SetHeader("Subject", "PChat OTP")
 	mail.SetBody("text/html", body.String())
 	// m.Attach(t) // attach whatever you want
 

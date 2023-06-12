@@ -30,8 +30,11 @@ type LoggerConfig struct {
 }
 
 type AuthenticationConfig struct {
-	SecretKey   string `mapstructure:"secret"`
-	ExpiredTime int64  `mapstructure:"expiredTime"`
+	SecretKey    string `mapstructure:"secret"`
+	ExpiredTime  int64  `mapstructure:"expiredTime"`
+	CookieName   string `mapstructure:"cookieName"`
+	CookiePath   string `mapstructure:"cookiePath"`
+	CookieSecure bool   `mapstructure:"cookieSecure"`
 }
 
 type DatabaseConfig struct {

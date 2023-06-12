@@ -8,7 +8,9 @@ service Friends {
 
 service Auth {
   rpc Login(LoginRequest) returns (LoginResponse);
-  rpc Register(RegisterRequest) returns (BasicResponse);
+  rpc Logout(LogoutRequest) returns (BasicResponse);
+  rpc VerifyOtp(VerifyOtpRequest) returns (BasicResponse);
+  rpc ResendOtp(ResendOtpRequest) returns (BasicResponse);
 }
 
 service Chat {
@@ -88,6 +90,19 @@ message BasicResponse {
   string sub_return_message = 4;
 }
 
+message VerifyOtpRequest {
+  string phone_number = 1;
+  string otp = 3;
+}
+
+message ResendOtpRequest {
+  string email = 1;
+}
+
+message LogoutRequest {
+  string phone_number = 1;
+}
+
 message LoginRequest {
   string phone_number = 1;
   string password = 2;
@@ -100,11 +115,6 @@ message LoginResponse {
   string sub_return_message = 4;
   string access_token = 5;
   string user_id = 6;
-}
-
-message RegisterRequest {
-  string phone_number = 1;
-  string password = 2;
 }
 
 message ChatMessage {

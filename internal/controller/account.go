@@ -5,13 +5,16 @@ import (
 	"chat-app/helper"
 	"chat-app/internal/common"
 	"chat-app/internal/service"
+	cache "chat-app/pkg/client/redis"
 	chat_app "chat-app/proto/chat-app"
 	"context"
+	"time"
 )
 
 type account struct {
 	accountService service.AccountService
 	mailService    service.MailService
+	redisCli       *cache.RedisClient
 }
 
 func (a account) Get(
@@ -65,8 +68,8 @@ func (a account) Create(
 	request *chat_app.CreateAccountRequest,
 ) (resp *chat_app.CreateAccountResponse, err error) {
 	var (
-		errCode         = common.OK
-		account, logger = helper.GetAccountAndLogger(ctx)
+		errCode   = common.OK
+		_, logger = helper.GetAccountAndLogger(ctx)
 	)
 	defer func() {
 		buildResponse(errCode, resp)
@@ -74,27 +77,36 @@ func (a account) Create(
 	}()
 	resp = new(chat_app.CreateAccountResponse)
 
-	logger.WithField("account", account)
-
 	passwordHash, err := helper.HashPassword(request.Password)
 	if err != nil {
+		logger.WithError(err).Errorln("hash password fail")
 		errCode = common.SystemError
 		return
 	}
 	opt, err := helper.GenOtp(config.GetAppConfig().Authentication.SecretKey)
 	if err != nil {
+		logger.WithError(err).Errorln("gen otp fail")
 		errCode = common.SystemError
 		return
 	}
-	request.Password = passwordHash
-	resp, errCode = a.accountService.Create(ctx, request)
-	if errCode != common.OK {
-		logger.WithError(err).Error("get role list failed")
+
+	err = a.redisCli.Set(ctx, request.GetEmail(), opt, time.Minute*5).Err()
+	if err != nil {
+		logger.WithError(err).Errorln("gen otp fail")
+		errCode = common.SystemError
 		return
 	}
 
-	err = a.mailService.SendOpt([]string{request.Email}, opt)
+	request.Password = passwordHash
+	resp, errCode = a.accountService.Create(ctx, request)
+	if errCode != common.OK {
+		logger.WithError(err).Error("create account fail")
+		return
+	}
+
+	err = a.mailService.SendOpt([]string{request.GetEmail()}, opt)
 	if err != nil {
+		logger.WithError(err).Error("send otp fail")
 		errCode = common.SystemError
 		return
 	}
@@ -105,9 +117,11 @@ func (a account) Create(
 func NewAccount(
 	accountService service.AccountService,
 	mailService service.MailService,
+	redisCli *cache.RedisClient,
 ) chat_app.AccountServer {
 	return &account{
 		accountService: accountService,
 		mailService:    mailService,
+		redisCli:       redisCli,
 	}
 }

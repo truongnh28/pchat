@@ -11,5 +11,6 @@ type (
 		Email       string `json:"email,omitempty"`
 		PhoneNumber string `json:"phoneNumber,omitempty"`
 		Status      string `json:"status,omitempty"`
+		Code        string `json:"code,omitempty"`
 	}
 )

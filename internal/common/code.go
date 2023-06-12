@@ -60,5 +60,7 @@ func (r SubReturnCode) Int32() int32 {
 }
 
 var (
-	NotFoundErr error = fmt.Errorf("not found")
+	NotFoundErr     error  = fmt.Errorf("not found")
+	CookieName      string = "pchat"
+	PrefixLoginCode string = "pchat"
 )

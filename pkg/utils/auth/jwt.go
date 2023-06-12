@@ -1,4 +1,4 @@
-package utils
+package auth
 
 import (
 	"fmt"
@@ -12,9 +12,15 @@ type JWTCheckSigningMethodFunc func(*jwt.Token) (interface{}, error)
 //go:generate mockgen -destination=./mocks/mock_$GOFILE -source=$GOFILE -package=mocks
 type JWTAuth interface {
 	InitializeToken(data string, signingMethod ...*jwt.SigningMethodHMAC) (string, error)
-	UpdateDataToken(tokenStr, newData string, checkSigningMethodFunc ...JWTCheckSigningMethodFunc) (string, error)
+	UpdateDataToken(
+		tokenStr, newData string,
+		checkSigningMethodFunc ...JWTCheckSigningMethodFunc,
+	) (string, error)
 	CheckValid(tokenStr string, checkSigningMethodFunc ...JWTCheckSigningMethodFunc) (bool, error)
-	GetDataFromToken(tokenStr string, checkSigningMethodFunc ...JWTCheckSigningMethodFunc) (interface{}, error)
+	GetDataFromToken(
+		tokenStr string,
+		checkSigningMethodFunc ...JWTCheckSigningMethodFunc,
+	) (interface{}, error)
 }
 
 type jwtAuth struct {
@@ -33,7 +39,10 @@ func NewJWTAuth(secretKey string, expiredTime int64, validateFunc JWTValidateFun
 }
 
 // InitializeToken from data
-func (j *jwtAuth) InitializeToken(data string, signingMethod ...*jwt.SigningMethodHMAC) (string, error) {
+func (j *jwtAuth) InitializeToken(
+	data string,
+	signingMethod ...*jwt.SigningMethodHMAC,
+) (string, error) {
 	var (
 		signMethod = jwt.SigningMethodHS256
 		claims     jwt.MapClaims
@@ -51,14 +60,17 @@ func (j *jwtAuth) InitializeToken(data string, signingMethod ...*jwt.SigningMeth
 
 func (j *jwtAuth) isValid(token *jwt.Token) (interface{}, error) {
 	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-		return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 	}
 
 	// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
 	return []byte(j.secretKey), nil
 }
 
-func (j *jwtAuth) CheckValid(tokenStr string, checkSigningMethodFunc ...JWTCheckSigningMethodFunc) (bool, error) {
+func (j *jwtAuth) CheckValid(
+	tokenStr string,
+	checkSigningMethodFunc ...JWTCheckSigningMethodFunc,
+) (bool, error) {
 	var (
 		checkSigningMethod = j.isValid
 		token              *jwt.Token
@@ -75,7 +87,10 @@ func (j *jwtAuth) CheckValid(tokenStr string, checkSigningMethodFunc ...JWTCheck
 	return ok && token.Valid, nil
 }
 
-func (j *jwtAuth) GetDataFromToken(tokenStr string, checkSigningMethodFunc ...JWTCheckSigningMethodFunc) (interface{}, error) {
+func (j *jwtAuth) GetDataFromToken(
+	tokenStr string,
+	checkSigningMethodFunc ...JWTCheckSigningMethodFunc,
+) (interface{}, error) {
 	var (
 		checkSigningMethod = j.isValid
 		token              *jwt.Token
@@ -99,7 +114,10 @@ func (j *jwtAuth) GetDataFromToken(tokenStr string, checkSigningMethodFunc ...JW
 	return nil, fmt.Errorf("token is invalid")
 }
 
-func (j *jwtAuth) UpdateDataToken(tokenStr, newData string, checkSigningMethodFunc ...JWTCheckSigningMethodFunc) (string, error) {
+func (j *jwtAuth) UpdateDataToken(
+	tokenStr, newData string,
+	checkSigningMethodFunc ...JWTCheckSigningMethodFunc,
+) (string, error) {
 	var (
 		checkSigningMethod = j.isValid
 		token              *jwt.Token

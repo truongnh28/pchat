@@ -1,14 +1,14 @@
 version: '3.7'
 services:
-  #  chat-app-redis:
-  #    image: 'redis:alpine'
-  #    container_name: chat-app-redis
-  #    environment:
-  #      - ALLOW_EMPTY_PASSWORD=yes
-  #    ports:
-  #      - "6379:6379"
-  #    networks:
-  #      - chat-app-network
+  chat-app-redis:
+    image: 'redis:alpine'
+    container_name: chat-app-redis
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - "6379:6379"
+    networks:
+      - chat-app-network
   chat-app-db:
     container_name: chat-app-db
     image: mysql:8
@@ -29,7 +29,7 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: 123456
-
+      MONGO_INITDB_DATABASE: chat-message
     ports:
       - "27017:27017"
     networks:
