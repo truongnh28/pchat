@@ -52,6 +52,8 @@ venv/
 
 #config
 config/local*
+config/google-services.json
+config/account-cert.json
 
 **/test-results/
 test-reports
