@@ -89,7 +89,8 @@ func setupHandler(s *denny.Denny) {
 	// Websockets Setup
 	hub := ws.NewHub(userService, messageService)
 	go hub.Run()
-	g.GET("/ws", func(c *gin.Context) {
-		ws.ServeWs(c, hub)
+	g.GET("/ws/:user_id", func(c *gin.Context) {
+		userID := c.Param("user_id")
+		ws.ServeWs(c, hub, userID)
 	})
 }

@@ -91,7 +91,7 @@ message BasicResponse {
 }
 
 message VerifyOtpRequest {
-  string phone_number = 1;
+  string email = 1;
   string otp = 3;
 }
 

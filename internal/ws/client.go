@@ -1,16 +1,15 @@
 package ws
 
 import (
-	"bytes"
 	"chat-app/internal/domain"
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/bytedance/sonic"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/whatvn/denny"
-	"log"
 	"net/http"
 	"time"
 )
@@ -48,11 +47,14 @@ type Client struct {
 }
 
 // ServeWs handles websockets requests from clients requests.
-func ServeWs(ctx *gin.Context, hub *Hub) interface{} {
-	username := ctx.MustGet("username").(string)
+func ServeWs(ctx *gin.Context, hub *Hub, userId string) interface{} {
+	var (
+		logger   = denny.GetLogger(ctx)
+		username = userId
+	)
 	conn, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {
-		log.Println(err)
+		logger.WithError(err).Errorln("start ws fail")
 		return nil
 	}
 
@@ -61,6 +63,7 @@ func ServeWs(ctx *gin.Context, hub *Hub) interface{} {
 	go client.readPump()
 	// sendChannel this user to register chanel
 	client.hub.RegisterChannel <- client
+	logger.Infof("ServeWs of user %s start!!!\n", username)
 	return nil
 }
 
@@ -93,6 +96,12 @@ func setSocketPayloadConfig(c *Client) {
 	})
 }
 
+func (client *Client) disconnect() {
+	client.hub.UnregisterChannel <- client
+	close(client.sendChannel)
+	_ = client.wsConn.Close()
+}
+
 func (client *Client) writePump() {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
@@ -102,9 +111,10 @@ func (client *Client) writePump() {
 	for {
 		select {
 		case payload, ok := <-client.sendChannel:
-			requestBody := new(bytes.Buffer)
-			_ = json.NewEncoder(requestBody).Encode(payload)
-			finalPayload := requestBody.Bytes()
+			//requestBody := new(bytes.Buffer)
+			//_ = json.NewEncoder(requestBody).Encode(payload)
+			//finalPayload := requestBody.Bytes()
+			//fmt.Println(string(finalPayload))
 			// set time write message, if timeout -> close connect
 			_ = client.wsConn.SetWriteDeadline(time.Now().Add(writeWait))
 			if !ok {
@@ -115,11 +125,13 @@ func (client *Client) writePump() {
 			if err != nil {
 				return
 			}
-			_, _ = w.Write(finalPayload)
+
+			_, _ = w.Write(payload)
 			n := len(client.sendChannel)
+
 			for i := 0; i < n; i++ {
-				_ = json.NewEncoder(requestBody).Encode(<-client.sendChannel)
-				_, _ = w.Write(requestBody.Bytes())
+				_, _ = w.Write(endline)
+				_, _ = w.Write(<-client.sendChannel)
 			}
 			if err := w.Close(); err != nil {
 				return
@@ -131,12 +143,6 @@ func (client *Client) writePump() {
 			}
 		}
 	}
-}
-
-func (client *Client) disconnect() {
-	client.hub.UnregisterChannel <- client
-	close(client.sendChannel)
-	_ = client.wsConn.Close()
 }
 
 func (client *Client) readPump() {
@@ -177,7 +183,6 @@ func (client *Client) handleNewMessage(msg []byte) {
 	case JoinUser:
 		client.handleJoinGroupMessage(message)
 	case NewMessage:
-	case EditMessage:
 		client.handleEmitMessage(message)
 	case DeleteMessage:
 
@@ -197,6 +202,7 @@ type chatListResponseStruct struct {
 }
 
 func (client *Client) handleEmitMessage(message ReceivedMessage) {
+	fmt.Println("handleEmitMessage")
 	logger := denny.GetLogger(ctx).WithField("socket payload event", client.id)
 
 	msg := (message.Payload).(map[string]interface{})["message"].(string)
@@ -211,10 +217,15 @@ func (client *Client) handleEmitMessage(message ReceivedMessage) {
 		SenderID:    senderId,
 		RecipientID: recipientId,
 		Message:     msg,
+		Time:        time.Now(),
 	}
-	_ = client.hub.MessageService.StoreNewChatMessages(ctx, &messagePacket)
+	err := client.hub.MessageService.StoreNewChatMessages(ctx, &messagePacket)
+	if err != nil {
+		fmt.Println(err)
+		logger.WithError(err).Errorln("store message fail")
+	}
 	e, err := sonic.Marshal(SocketMessage{
-		Event:   "msg-response",
+		Event:   NewMessage,
 		Payload: messagePacket,
 	})
 	if err != nil {

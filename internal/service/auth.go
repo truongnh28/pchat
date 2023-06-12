@@ -110,19 +110,20 @@ func (a *authenServiceImpl) VerifyOpt(
 		err    = error(nil)
 	)
 
-	res := a.serverCache.Get(ctx, req.GetPhoneNumber())
+	res := a.serverCache.Get(ctx, req.GetEmail())
 	if res.Err() != nil {
-		logger.WithError(err).Errorln("get otp from redis fail")
-		return false, err
+		fmt.Println(res.Err())
+		logger.WithError(res.Err()).Errorln("get otp from redis fail: ", res.Err())
+		return false, res.Err()
 	}
 
 	if res.Val() != req.GetOtp() {
 		logger.Errorln("wrong otp")
-		return false, err
+		return false, errors.New("wrong otp")
 	}
 	_, err = a.accountRepo.UpdateStatus(
 		ctx,
-		req.PhoneNumber,
+		req.GetEmail(),
 		models.Active,
 	)
 	if err != nil {

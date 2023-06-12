@@ -19,7 +19,7 @@ type AccountRepository interface {
 	) (int64, error)
 	UpdateStatus(
 		ctx context.Context,
-		phoneNumber string,
+		email string,
 		status models.AccountStatus,
 	) (int64, error)
 	Validate(ctx context.Context, req models.Account) error
@@ -31,13 +31,13 @@ type accountRepository struct {
 
 func (a *accountRepository) UpdateStatus(
 	ctx context.Context,
-	phoneNumber string,
+	email string,
 	status models.AccountStatus,
 ) (int64, error) {
 	db := a.database.WithContext(ctx)
 	result := db.Model(models.Account{}).
-		Select("password").
-		Where("phone_number = ?", phoneNumber).
+		Select("status").
+		Where("email = ?", email).
 		Updates(models.Account{Status: status})
 	return result.RowsAffected, result.Error
 }

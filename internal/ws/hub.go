@@ -54,13 +54,11 @@ func (h *Hub) unregisterClient(client *Client) {
 func (h *Hub) EmitToSpecificClient(payload []byte, userId string) {
 	for client := range h.ConnectedClients {
 		if client.id == userId {
-			for {
-				select {
-				case client.sendChannel <- payload:
-				default:
-					close(client.sendChannel)
-					delete(h.ConnectedClients, client)
-				}
+			select {
+			case client.sendChannel <- payload:
+			default:
+				close(client.sendChannel)
+				delete(h.ConnectedClients, client)
 			}
 		}
 	}

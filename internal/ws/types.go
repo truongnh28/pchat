@@ -14,9 +14,8 @@ type SocketMessage struct {
 
 // ReceivedMessage represents a received websocket message
 type ReceivedMessage struct {
-	Event   Event  `json:"event"`
-	Group   string `json:"group"`
-	Payload any    `json:"payload"`
+	Event   Event `json:"event"`
+	Payload any   `json:"payload"`
 }
 
 func (s *SocketMessage) Encode() []byte {
