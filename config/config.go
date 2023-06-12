@@ -18,6 +18,7 @@ type AppConfig struct {
 	IsProduction        bool                  `mapstructure:"isProduction"`
 	Redis               *RedisConfig          `mapstructure:"redis"`
 	Mail                *MailConfig           `mapstructure:"mail"`
+	Cloudinary          *CloudinaryConfig     `mapstructure:"cloudinary"`
 }
 
 type ServerConfig struct {
@@ -52,10 +53,17 @@ type RedisConfig struct {
 }
 
 type MailConfig struct {
-	MailSender string `mapstructure:"mailSender,omitempty"`
-	Password   string `mapstructure:"password,omitempty"`
-	SmtpHost   string `mapstructure:"smtpHost,omitempty"`
-	SmtpPort   int    `mapstructure:"smtpPort,omitempty"`
+	MailSender string `mapstructure:"mailSender"`
+	Password   string `mapstructure:"password"`
+	SmtpHost   string `mapstructure:"smtpHost"`
+	SmtpPort   int    `mapstructure:"smtpPort"`
+}
+
+type CloudinaryConfig struct {
+	Name      string `mapstructure:"cloudName"`
+	APIKey    string `mapstructure:"apiKey"`
+	APISecret string `mapstructure:"apiSecret"`
+	Folder    string `mapstructure:"folder"`
 }
 
 var (

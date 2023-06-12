@@ -1,11 +1,31 @@
-package cache
+package client
 
 import (
+	"chat-app/config"
 	"context"
-	"time"
-
+	"fmt"
 	"github.com/go-redis/redis/v8"
+	"sync"
+	"time"
 )
+
+var redisClient *RedisClient
+var redisOnce sync.Once
+
+func GetRedisClient(redisConfig *config.RedisConfig) *RedisClient {
+	redisOnce.Do(func() {
+		redisClient = &RedisClient{
+			client: redis.NewClient(&redis.Options{
+				Addr:     fmt.Sprintf("%s:%d", redisConfig.Host, redisConfig.Port),
+				Password: redisConfig.Password,
+			}),
+		}
+		if err := redisClient.client.Ping(context.Background()).Err(); err != nil {
+			panic(fmt.Errorf("unable to connect to redis: %v", err.Error()))
+		}
+	})
+	return redisClient
+}
 
 type Redis interface {
 	HSet(ctx context.Context, key, field string, values interface{}) *redis.IntCmd
