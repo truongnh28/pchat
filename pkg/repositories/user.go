@@ -9,7 +9,7 @@ import (
 //go:generate mockgen -destination=./mocks/mock_$GOFILE -source=$GOFILE -package=mocks
 
 type UserRepository interface {
-	Create(user *models.User) error
+	Create(user *models.Account) error
 	GetByUserId(userId string) (*domain.UserDetail, error)
 	UpdateUserOnlineStatusByUserID(userID string, status bool) error
 	GetUserByUsername(username string) (*domain.UserDetail, error)
@@ -41,16 +41,18 @@ func (n *userRepositoryImpl) IsUsernameAvailableQueryHandler(username string) bo
 	panic("implement me")
 }
 
-func (n *userRepositoryImpl) GetAllOnlineUsers(userID string) ([]*domain.UserDetailsRequest, error) {
+func (n *userRepositoryImpl) GetAllOnlineUsers(
+	userID string,
+) ([]*domain.UserDetailsRequest, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
 func (n *userRepositoryImpl) Create(
-	user *models.User,
+	user *models.Account,
 ) error {
 	return n.database.
-		Model(models.User{}).
+		Model(models.Account{}).
 		Create(&user).
 		Error
 }

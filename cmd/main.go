@@ -22,9 +22,9 @@ func main() {
 	config.Load()
 	initLogger()
 
-	server := server.HTTPServer{}
-	server.Init()
-	if err := server.Run(); err != nil {
-		logrus.WithError(err).Fatal("failed to start server")
+	httpServer := server.HTTPServer{}
+	httpServer.Init()
+	if err := httpServer.Run(); err != nil {
+		logrus.WithError(err).Fatal("failed to start httpServer")
 	}
 }

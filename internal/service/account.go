@@ -7,6 +7,7 @@ import (
 	chat_app "chat-app/proto/chat-app"
 	"context"
 	"github.com/golang/glog"
+	"github.com/whatvn/denny"
 	"strings"
 )
 
@@ -34,9 +35,10 @@ func (a *accountService) Get(
 	req *chat_app.GetAccountRequest,
 ) (*chat_app.GetAccountResponse, common.SubReturnCode) {
 	var (
-		acc  = &models.Account{}
-		err  = error(nil)
-		resp = &chat_app.GetAccountResponse{}
+		acc    = &models.Account{}
+		err    = error(nil)
+		resp   = &chat_app.GetAccountResponse{}
+		logger = denny.GetLogger(ctx)
 	)
 	if req.GetUsername() == "" && req.GetUserId() == 0 {
 		return resp, common.SystemError
@@ -48,6 +50,7 @@ func (a *accountService) Get(
 	}
 	if err != nil {
 		glog.Errorf("Find user fail: %s", err)
+		logger.WithError(err)
 		return resp, common.SystemError
 	}
 	resp.Info = &chat_app.AccountInfo{
@@ -63,14 +66,17 @@ func (a *accountService) UpdatePassword(
 	ctx context.Context,
 	req *chat_app.UpdateAccountRequest,
 ) common.SubReturnCode {
+	var (
+		logger = denny.GetLogger(ctx)
+	)
 	rowsAffected, err := a.accountRepository.UpdatePassword(ctx, req)
 	if err != nil {
-		glog.Errorln("Update failed: ", err)
+		logger.WithError(err).Errorln("Update failed: ", err)
 		return common.SystemError
 	}
 
 	if rowsAffected == 0 {
-		glog.Errorln("User not exist", req.GetUsername())
+		logger.Errorln("user not exist", req.GetUsername())
 		return common.SystemError
 	}
 
@@ -82,7 +88,8 @@ func (a *accountService) Create(
 	req *chat_app.CreateAccountRequest,
 ) (*chat_app.CreateAccountResponse, common.SubReturnCode) {
 	var (
-		resp = &chat_app.CreateAccountResponse{}
+		resp   = &chat_app.CreateAccountResponse{}
+		logger = denny.GetLogger(ctx)
 	)
 	acc := models.Account{
 		UserName:    req.GetUsername(),
@@ -97,12 +104,12 @@ func (a *accountService) Create(
 		if strings.Contains(err.Error(), "is exist") {
 			errStr = "Invalid request: "
 		}
-		glog.Errorln(errStr, err)
+		logger.Errorln(errStr, err)
 		return resp, common.SystemError
 	}
 	err = a.accountRepository.Create(ctx, acc)
 	if err != nil {
-		glog.Errorln("Create Account service err: ", err)
+		logger.Errorln("Create Account service err: ", err)
 		return resp, common.SystemError
 	}
 	resp.Info = &chat_app.AccountInfo{

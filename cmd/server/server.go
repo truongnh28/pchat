@@ -27,7 +27,6 @@ func (_ *HTTPServer) Run() error {
 	server.WithMiddleware(gin.Recovery(), dennyHttp.Logger())
 	server.RedirectTrailingSlash = false
 	setupHandler(server)
-
 	server.Info("starting http server...")
 	return server.GraceFulStart(fmt.Sprintf(":%s", serverConfig.Port))
 }
@@ -51,22 +50,18 @@ func setupHandler(s *denny.Denny) {
 	chatMessageDB := repositories.InitChatMessageDatabase()
 	userRepo := repositories.NewUserRepository(chatAppDB)
 	userService := service.NewUserService(userRepo)
-	messageRepo := repositories.NewMessageRepository(chatMessageDB)
+	messageRepo := repositories.NewMessageRepository(chatMessageDB.DB)
 	messageService := service.NewMessageService(messageRepo)
 	accountRepo := repositories.NewAccountRepository(chatAppDB)
 	accountService := service.NewAccountService(accountRepo)
 	mailService := service.NewMailService(config.GetAppConfig().Mail, _const.MailTemplatePath)
-	//redisCli := redis.Client{}
+
 	apiGroup.BrpcController(
 		controller.NewMessage(
 			messageService,
 		),
 	)
-	apiGroup.BrpcController(
-		controller.NewMessage(
-			messageService,
-		),
-	)
+
 	apiGroup.BrpcController(
 		controller.NewUser(
 			userService,
@@ -78,11 +73,9 @@ func setupHandler(s *denny.Denny) {
 			mailService,
 		),
 	)
-
 	// Websockets Setup
 	hub := ws.NewHub(userService, messageService)
 	go hub.Run()
-
 	g.GET("/ws", func(c *gin.Context) {
 		ws.ServeWs(c, hub)
 	})
