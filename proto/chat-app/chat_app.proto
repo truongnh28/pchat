@@ -13,7 +13,8 @@ service Auth {
   rpc ResendOtp(ResendOtpRequest) returns (BasicResponse);
 }
 
-service Chat {
+service Message {
+  rpc CreateMessage(EmptyRequest) returns (BasicResponse);
   rpc GetChatHistory(ChatHistoryRequest) returns (ChatHistoryResponse);
 }
 

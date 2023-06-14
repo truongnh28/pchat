@@ -4,11 +4,8 @@ type Event string
 
 // Subscribed message
 const (
-	JoinUser  Event = "JoinUser"
-	LeaveUser Event = "LeaveUser"
-
-	JoinGroup  Event = "JoinGroup"
-	LeaveGroup Event = "LeaveGroup"
+	JoinRoom  Event = "JoinRoom"
+	LeaveRoom Event = "LeaveRoom"
 
 	StartTyping Event = "StartTyping"
 	StopTyping  Event = "StopTyping"

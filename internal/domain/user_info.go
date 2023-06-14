@@ -11,7 +11,7 @@ type UserDetail struct {
 
 // MessageConversation is a universal struct for mapping the conversations
 type MessageConversation struct {
-	ID          string `json:"id" bson:"_id,omitempty"`
+	ID          string `json:"id"          bson:"_id,omitempty"`
 	Message     string `json:"message"`
 	SenderID    string `json:"SenderID"`
 	RecipientID string `json:"recipientID"`
@@ -29,3 +29,21 @@ type UserDetailsResponse struct {
 	UserID   string `json:"userID"`
 	Online   string `json:"online"`
 }
+
+// FriendRequest contains all info to display request.
+// Type stands for the type of the request.
+// 1: Incoming,
+// 0: Outgoing
+type FriendRequest struct {
+	Id       string      `json:"id"`
+	Username string      `json:"username"`
+	ImageUrl string      `json:"image_url"`
+	Type     RequestType `json:"type"`
+}
+
+type RequestType string
+
+const (
+	InComing RequestType = "InComing"
+	Outgoing RequestType = "Outgoing"
+)

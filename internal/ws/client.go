@@ -3,9 +3,7 @@ package ws
 import (
 	"chat-app/internal/domain"
 	"context"
-	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/bytedance/sonic"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -44,6 +42,7 @@ type Client struct {
 	hub         *Hub
 	wsConn      *websocket.Conn
 	sendChannel chan []byte
+	rooms       map[*Room]bool
 }
 
 // ServeWs handles websockets requests from clients requests.
@@ -73,6 +72,7 @@ func newClient(conn *websocket.Conn, hub *Hub, username string) *Client {
 		hub:         hub,
 		wsConn:      conn,
 		sendChannel: make(chan []byte, 256),
+		rooms:       make(map[*Room]bool),
 	}
 }
 func unregisterAndCloseConnection(c *Client) {
@@ -111,11 +111,6 @@ func (client *Client) writePump() {
 	for {
 		select {
 		case payload, ok := <-client.sendChannel:
-			//requestBody := new(bytes.Buffer)
-			//_ = json.NewEncoder(requestBody).Encode(payload)
-			//finalPayload := requestBody.Bytes()
-			//fmt.Println(string(finalPayload))
-			// set time write message, if timeout -> close connect
 			_ = client.wsConn.SetWriteDeadline(time.Now().Add(writeWait))
 			if !ok {
 				_ = client.wsConn.WriteMessage(websocket.CloseMessage, []byte{})
@@ -169,40 +164,30 @@ func (client *Client) readPump() {
 		}
 
 		//Getting the proper payload to sendChannel the client
-		client.handleNewMessage(payload)
+		client.handleEvent(payload)
 	}
 }
 
-func (client *Client) handleNewMessage(msg []byte) {
+func (client *Client) handleEvent(msg []byte) {
 	var message ReceivedMessage
 	logger := denny.GetLogger(ctx)
-	if err := json.Unmarshal(msg, &message); err != nil {
+	if err := sonic.Unmarshal(msg, &message); err != nil {
 		logger.WithError(err).Error("unmarshal JSON message fail")
 	}
 	switch message.Event {
-	case JoinUser:
-		client.handleJoinGroupMessage(message)
-	case NewMessage:
-		client.handleEmitMessage(message)
-	case DeleteMessage:
-
-	case LeaveUser:
+	case JoinRoom:
+		client.handleJoinRoom(message)
+	case LeaveRoom:
 		client.handleLeaveGroup(message)
-	case JoinGroup:
-	case LeaveGroup:
+	// Chat Typing Actions
 	case StartTyping:
+		client.handleTypingEvent(message, StartTyping)
 	case StopTyping:
-
+		client.handleTypingEvent(message, StopTyping)
 	}
 }
 
-type chatListResponseStruct struct {
-	Type     string      `json:"type"`
-	ChatList interface{} `json:"chat_list"`
-}
-
-func (client *Client) handleEmitMessage(message ReceivedMessage) {
-	fmt.Println("handleEmitMessage")
+func (client *Client) handleEmitMessage(message SocketMessage) {
 	logger := denny.GetLogger(ctx).WithField("socket payload event", client.id)
 
 	msg := (message.Payload).(map[string]interface{})["message"].(string)
@@ -221,10 +206,10 @@ func (client *Client) handleEmitMessage(message ReceivedMessage) {
 	}
 	err := client.hub.MessageService.StoreNewChatMessages(ctx, &messagePacket)
 	if err != nil {
-		fmt.Println(err)
 		logger.WithError(err).Errorln("store message fail")
+		return
 	}
-	e, err := sonic.Marshal(SocketMessage{
+	payload, err := sonic.Marshal(SocketMessage{
 		Event:   NewMessage,
 		Payload: messagePacket,
 	})
@@ -232,78 +217,48 @@ func (client *Client) handleEmitMessage(message ReceivedMessage) {
 		logger.WithError(err).Errorf("marshal msg to byte array fail")
 		return
 	}
-	client.hub.EmitToSpecificClient(e, recipientId)
+	if recipientId == "" {
+		// handle send message single user
+		client.hub.EmitToSpecificClient(payload, recipientId)
+	} else {
+		// handle send message group
+		client.hub.BroadcastSocketEventToAllClientExceptMe(payload, senderId)
+	}
 }
 
-func (client *Client) handleJoinGroupMessage(message ReceivedMessage) {
-	logger := denny.GetLogger(ctx)
-	userId := (message.Payload).(string)
-	userDetail, err := client.hub.UserService.GetByUserId(userId)
-	if err != nil {
-		logger.WithError(err).Errorf("get user by id fail")
-		return
+func (client *Client) handleJoinRoom(message ReceivedMessage) {
+	var (
+		logger = denny.GetLogger(ctx)
+		roomId = message.Room
+	)
+	room := client.hub.findRoomById(roomId)
+	if room == nil {
+		client.hub.createRoom(roomId)
 	}
-
-	msg, err := sonic.Marshal(SocketMessage{
-		Event: JoinUser,
-		Payload: domain.UserDetail{
-			ID:       userId,
-			Username: userDetail.Username,
-			Online:   userDetail.Online,
-		},
-	})
-
-	if err != nil {
-		logger.WithError(err).Errorf("marshal message to byte array fail")
-		return
-	}
-
-	client.hub.BroadcastSocketEventToAllClientExceptMe(msg, userId)
-
-	userOnl, err := client.hub.UserService.GetAllOnlineUsers(userId)
-	if err != nil {
-		logger.WithError(err).Errorf("marshal message to byte array fail")
-		return
-	}
-
-	allOnlineUsers := SocketMessage{
-		Event: "chatlist-response",
-		Payload: chatListResponseStruct{
-			Type:     "my-chat-list",
-			ChatList: userOnl,
-		},
-	}
-	msg, err = sonic.Marshal(allOnlineUsers)
-	if err != nil {
-		logger.WithError(err).Errorf("marshal message to byte array fail")
-		return
-	}
-	client.hub.EmitToSpecificClient(msg, userId)
+	client.rooms[room] = true
+	room.register <- client
+	logger.Infof("join room success!!!\n")
 }
 
 func (client *Client) handleLeaveGroup(message ReceivedMessage) {
-	userId := (message.Payload).(string)
 	logger := denny.GetLogger(ctx)
-	userDetail, err := client.hub.UserService.GetByUserId(userId)
-	if err != nil {
-		logger.WithError(err).Errorf("get user by id fail")
-		return
+	room := client.hub.findRoomById(message.Room)
+	delete(client.rooms, room)
+
+	if room != nil {
+		room.unregister <- client
 	}
-	_ = client.hub.UserService.UpdateUserOnlineStatusByUserID(userId, false)
-	msg, err := sonic.Marshal(SocketMessage{
-		Event: "chatlist-response",
-		Payload: chatListResponseStruct{
-			Type: "user-disconnect",
-			ChatList: domain.UserDetail{
-				ID:       userId,
-				Username: userDetail.Username,
-				Online:   false,
-			},
-		},
-	})
-	if err != nil {
-		logger.WithError(err).Errorf("marshal message to byte array fail")
-		return
+	logger.Infof("leave room success!!!\n")
+}
+
+// handleTypingEvent emits the username of the currently typing user to the room
+func (client *Client) handleTypingEvent(message ReceivedMessage, event Event) {
+	roomID := message.Room
+	if room := client.hub.findRoomById(roomID); room != nil {
+		msg := SocketMessage{
+			Event:   event,
+			Payload: message.Message,
+		}
+		room.broadcast <- msg.Encode()
 	}
-	client.hub.BroadcastSocketEventToAllClient(msg)
 }

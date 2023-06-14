@@ -2,9 +2,16 @@ package ws
 
 import (
 	"context"
-	"encoding/json"
+	"github.com/bytedance/sonic"
 	"github.com/whatvn/denny"
 )
+
+// ReceivedMessage represents a received websocket message
+type ReceivedMessage struct {
+	Event   Event  `json:"event"`
+	Room    string `json:"room"`
+	Message *any   `json:"message"`
+}
 
 // SocketMessage is a type for socket events which
 type SocketMessage struct {
@@ -12,14 +19,8 @@ type SocketMessage struct {
 	Payload any   `json:"payload"`
 }
 
-// ReceivedMessage represents a received websocket message
-type ReceivedMessage struct {
-	Event   Event `json:"event"`
-	Payload any   `json:"payload"`
-}
-
 func (s *SocketMessage) Encode() []byte {
-	encoding, err := json.Marshal(s)
+	encoding, err := sonic.Marshal(s)
 	if err != nil {
 		denny.GetLogger(context.Background()).Error("Encode Socket err: ", err)
 	}

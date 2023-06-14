@@ -3,5 +3,6 @@ package domain
 import "mime/multipart"
 
 type UploadIn struct {
-	File multipart.File
+	FileName string         `json:"file_name,omitempty"`
+	FileData multipart.File `json:"file_data,omitempty"`
 }

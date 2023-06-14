@@ -1,25 +1,58 @@
 package controller
 
 import (
+	"chat-app/helper"
 	"chat-app/internal/common"
+	"chat-app/internal/domain"
 	"chat-app/internal/service"
 	chat_app "chat-app/proto/chat-app"
 	"context"
 	"errors"
 	"fmt"
+	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
 	"github.com/whatvn/denny"
 )
 
 type message struct {
 	messageService service.MessageService
+	mediaService   service.MediaService
 }
 
-func NewMessage(
-	messageService service.MessageService,
-) chat_app.ChatServer {
-	return &message{
-		messageService: messageService,
+func (m *message) CreateMessage(
+	ctx context.Context,
+	request *chat_app.EmptyRequest,
+) (resp *chat_app.BasicResponse, err error) {
+	var (
+		errCode   = common.OK
+		_, logger = helper.GetAccountAndLogger(ctx)
+		ok        = false
+		httpCtx   *denny.Context
+		uploadRes *uploader.UploadResult
+	)
+	defer func() {
+		buildResponse(errCode, resp)
+		err = nil
+	}()
+	resp = new(chat_app.BasicResponse)
+	httpCtx, ok = ctx.(*denny.Context)
+	if !ok {
+		errCode = common.SystemError
+		logger.WithError(errors.New("get httpCtx fail"))
+		return
 	}
+	file, fileHeader, err := httpCtx.Request.FormFile("file")
+	if err != nil {
+		errCode = common.InvalidRequest
+		logger.Errorln("Get file from request err: ", err)
+		return
+	}
+	uploadRes, errCode = m.mediaService.Upload(domain.UploadIn{
+		FileName: fileHeader.Filename,
+		FileData: file,
+	})
+	// text := httpCtx.Request.FormValue("text")
+
+	return
 }
 
 func (m *message) GetChatHistory(ctx context.Context, req *chat_app.ChatHistoryRequest) (
@@ -69,4 +102,14 @@ func (m *message) GetChatHistory(ctx context.Context, req *chat_app.ChatHistoryR
 	}
 	resp.ChatHistory = respChatHistory
 	return
+}
+
+func NewMessage(
+	messageService service.MessageService,
+	mediaService service.MediaService,
+) chat_app.MessageServer {
+	return &message{
+		messageService: messageService,
+		mediaService:   mediaService,
+	}
 }

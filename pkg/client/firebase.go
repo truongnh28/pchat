@@ -94,6 +94,7 @@ func (f2 *firebase) SendToTopic(ctx context.Context, topic string) error {
 
 	return nil
 }
+
 func (f2 *firebase) SendMultiClient(ctx context.Context, tokens []string) error {
 	logger := denny.GetLogger(ctx)
 	message := &messaging.MulticastMessage{
