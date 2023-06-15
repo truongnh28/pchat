@@ -11,11 +11,14 @@ import (
 	"fmt"
 	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
 	"github.com/whatvn/denny"
+	"net/http"
+	"time"
 )
 
 type message struct {
 	messageService service.MessageService
 	mediaService   service.MediaService
+	socketService  service.SocketService
 }
 
 func (m *message) CreateMessage(
@@ -23,11 +26,11 @@ func (m *message) CreateMessage(
 	request *chat_app.EmptyRequest,
 ) (resp *chat_app.BasicResponse, err error) {
 	var (
-		errCode   = common.OK
-		_, logger = helper.GetAccountAndLogger(ctx)
-		ok        = false
-		httpCtx   *denny.Context
-		uploadRes *uploader.UploadResult
+		errCode        = common.OK
+		userId, logger = helper.GetAccountAndLogger(ctx)
+		ok             = false
+		httpCtx        *denny.Context
+		uploadRes      *uploader.UploadResult
 	)
 	defer func() {
 		buildResponse(errCode, resp)
@@ -40,17 +43,47 @@ func (m *message) CreateMessage(
 		logger.WithError(errors.New("get httpCtx fail"))
 		return
 	}
-	file, fileHeader, err := httpCtx.Request.FormFile("file")
+	roomId := httpCtx.Request.FormValue("room_id")
+	if roomId == "" {
+		errCode = common.InvalidRequest
+		logger.WithError(errors.New("room_id is valid"))
+		return
+	}
+	err = httpCtx.Request.ParseMultipartForm(32 << 20)
 	if err != nil {
+		errCode = common.InvalidRequest
+		logger.WithError(errors.New("cloud not parse form data"))
+		return
+	}
+	text := httpCtx.Request.FormValue("text")
+	file, fileHeader, err := httpCtx.Request.FormFile("file")
+	if err == http.ErrMissingFile && text == "" {
 		errCode = common.InvalidRequest
 		logger.Errorln("Get file from request err: ", err)
 		return
 	}
-	uploadRes, errCode = m.mediaService.Upload(domain.UploadIn{
-		FileName: fileHeader.Filename,
-		FileData: file,
-	})
-	// text := httpCtx.Request.FormValue("text")
+
+	if text != "" {
+		m.socketService.EmitNewMessage(ctx, roomId, &domain.ChatMessage{
+			SenderID:    userId,
+			RecipientID: roomId,
+			Message:     text,
+			Time:        time.Now(),
+		})
+	}
+
+	if err == nil {
+		uploadRes, errCode = m.mediaService.Upload(domain.UploadIn{
+			FileName: fileHeader.Filename,
+			FileData: file,
+		})
+		m.socketService.EmitNewMessage(ctx, roomId, &domain.ChatMessage{
+			SenderID:    userId,
+			RecipientID: roomId,
+			Message:     uploadRes.SecureURL,
+			Time:        time.Now(),
+		})
+	}
 
 	return
 }
@@ -74,12 +107,12 @@ func (m *message) GetChatHistory(ctx context.Context, req *chat_app.ChatHistoryR
 
 	resp = new(chat_app.ChatHistoryResponse)
 
-	if req.SenderId == "" {
+	if req.GetSenderId() == "" {
 		err = errors.New("sender id isn't valid")
 		subReturnCode = common.InvalidRequest
 		return
 	}
-	if req.RecipientId == "" {
+	if req.GetRecipientId() == "" {
 		err = errors.New("recipient id isn't valid")
 		subReturnCode = common.InvalidRequest
 		return
@@ -91,6 +124,7 @@ func (m *message) GetChatHistory(ctx context.Context, req *chat_app.ChatHistoryR
 		subReturnCode = returnCode
 		return
 	}
+
 	respChatHistory := make([]*chat_app.ChatMessage, 0)
 	for _, it := range chatHistory {
 		respChatHistory = append(respChatHistory, &chat_app.ChatMessage{
@@ -107,9 +141,11 @@ func (m *message) GetChatHistory(ctx context.Context, req *chat_app.ChatHistoryR
 func NewMessage(
 	messageService service.MessageService,
 	mediaService service.MediaService,
+	socketService service.SocketService,
 ) chat_app.MessageServer {
 	return &message{
 		messageService: messageService,
 		mediaService:   mediaService,
+		socketService:  socketService,
 	}
 }
