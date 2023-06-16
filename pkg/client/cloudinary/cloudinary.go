@@ -1,4 +1,4 @@
-package client
+package cloudinary
 
 import (
 	"chat-app/config"

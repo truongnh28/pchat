@@ -3,7 +3,7 @@ package service
 import (
 	"chat-app/internal/common"
 	"chat-app/internal/domain"
-	"chat-app/pkg/client"
+	"chat-app/pkg/client/cloudinary"
 	"context"
 	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
 	"github.com/golang/glog"
@@ -14,14 +14,14 @@ type MediaService interface {
 	Upload(in domain.UploadIn) (*uploader.UploadResult, common.SubReturnCode)
 }
 
-func NewMediaService(cldClient client.CloudinaryAPI) MediaService {
+func NewMediaService(cldClient cloudinary.CloudinaryAPI) MediaService {
 	return &mediaServiceImpl{
 		cld: cldClient,
 	}
 }
 
 type mediaServiceImpl struct {
-	cld client.CloudinaryAPI
+	cld cloudinary.CloudinaryAPI
 }
 
 func (m mediaServiceImpl) Upload(

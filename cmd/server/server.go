@@ -6,7 +6,8 @@ import (
 	"chat-app/internal/controller"
 	"chat-app/internal/service"
 	"chat-app/internal/ws"
-	"chat-app/pkg/client"
+	"chat-app/pkg/client/cloudinary"
+	"chat-app/pkg/client/redis"
 	"chat-app/pkg/repositories"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -44,8 +45,8 @@ func setupHandler(s *denny.Denny) {
 	wsGroup := s.NewGroup("/ws")
 	wsGroup.WithCors()
 
-	redisCli := client.GetRedisClient(config.GetAppConfig().Redis)
-	cld := client.GetCloudinaryAPI(config.GetAppConfig().Cloudinary)
+	redisCli := redis.GetRedisClient(config.GetAppConfig().Redis)
+	cld := cloudinary.GetCloudinaryAPI(config.GetAppConfig().Cloudinary)
 
 	chatAppDB := repositories.InitChatAppDatabase()
 	chatMessageDB := repositories.InitChatMessageDatabase()

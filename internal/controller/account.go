@@ -5,7 +5,7 @@ import (
 	"chat-app/helper"
 	"chat-app/internal/common"
 	"chat-app/internal/service"
-	cache "chat-app/pkg/client"
+	cache "chat-app/pkg/client/redis"
 	chat_app "chat-app/proto/chat-app"
 	"context"
 	"time"

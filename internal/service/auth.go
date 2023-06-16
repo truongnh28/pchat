@@ -6,7 +6,7 @@ import (
 	"chat-app/internal/common"
 	"chat-app/internal/domain"
 	"chat-app/models"
-	cache "chat-app/pkg/client"
+	cache "chat-app/pkg/client/redis"
 	"chat-app/pkg/repositories"
 	"chat-app/pkg/utils/auth"
 	chat_app "chat-app/proto/chat-app"

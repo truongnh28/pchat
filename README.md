@@ -8,6 +8,10 @@
 
 # ref
 
-https://github.com/manhtai/golang-nsq-chat
-https://www.cometchat.com/blog/chat-application-architecture-and-system-design
 https://github.com/ErfiDev/meetup-app
+
+https://bytebytego.com/courses/system-design-interview/design-a-chat-system
+
+https://www.codekarle.com/system-design/Zoom-system-design.html
+
+https://github.com/forPelevin/go-push-tester/blob/main/buffer_test.go
