@@ -5,8 +5,8 @@ type (
 		UserName string
 		Password string
 	}
-	Account struct {
-		UserId      uint64 `json:"userId,omitempty"`
+	User struct {
+		UserId      string `json:"userId,omitempty"`
 		Username    string `json:"username,omitempty"`
 		Email       string `json:"email,omitempty"`
 		PhoneNumber string `json:"phoneNumber,omitempty"`

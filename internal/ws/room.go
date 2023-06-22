@@ -1,8 +1,8 @@
 package ws
 
 import (
+	redis2 "chat-app/pkg/client/redis"
 	"context"
-	"github.com/go-redis/redis/v8"
 	"log"
 )
 
@@ -13,13 +13,13 @@ type Room struct {
 	register   chan *Client
 	unregister chan *Client
 	broadcast  chan []byte
-	redis      *redis.Client
+	redis      redis2.IRedisClient
 }
 
 var ctxRoom = context.Background()
 
 // NewRoom creates a new Room
-func NewRoom(id string, rds *redis.Client) *Room {
+func NewRoom(id string, rds redis2.IRedisClient) *Room {
 	return &Room{
 		id:         id,
 		clients:    make(map[*Client]bool),
@@ -78,7 +78,8 @@ func (room *Room) publishRoomMessage(message []byte) {
 
 // subscribeToRoomMessages subscribes to messages in this room
 func (room *Room) subscribeToRoomMessages() {
-	pubsub := room.redis.Subscribe(ctxRoom, room.GetId())
+	channel := []string{room.GetId()}
+	pubsub := room.redis.Subscribe(ctxRoom, channel)
 	ch := pubsub.Channel()
 	for msg := range ch {
 		room.broadcastToClientsInRoom([]byte(msg.Payload))

@@ -23,7 +23,7 @@ func main() {
 	initLogger()
 
 	httpServer := server.HTTPServer{}
-	httpServer.Init()
+
 	if err := httpServer.Run(); err != nil {
 		logrus.WithError(err).Fatal("failed to start httpServer")
 	}

@@ -8,6 +8,7 @@ import (
 	"chat-app/internal/ws"
 	"chat-app/pkg/client/cloudinary"
 	"chat-app/pkg/client/redis"
+	"chat-app/pkg/middleware"
 	"chat-app/pkg/repositories"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -16,10 +17,6 @@ import (
 )
 
 type HTTPServer struct {
-}
-
-func (h *HTTPServer) Init() {
-	initAuthentication()
 }
 
 func (_ *HTTPServer) Run() error {
@@ -31,10 +28,6 @@ func (_ *HTTPServer) Run() error {
 	setupHandler(server)
 	server.Info("starting http server...")
 	return server.GraceFulStart(fmt.Sprintf(":%s", serverConfig.Port))
-}
-
-func initAuthentication() {
-	//TODO: handle auth
 }
 
 func setupHandler(s *denny.Denny) {
@@ -51,15 +44,23 @@ func setupHandler(s *denny.Denny) {
 	chatAppDB := repositories.InitChatAppDatabase()
 	chatMessageDB := repositories.InitChatMessageDatabase()
 	userRepo := repositories.NewUserRepository(chatAppDB)
-	userService := service.NewUserService(userRepo)
+	accountRepo := repositories.NewUserRepository(chatAppDB)
 	messageRepo := repositories.NewMessageRepository(chatMessageDB.DB)
-	messageService := service.NewMessageService(messageRepo)
-	accountRepo := repositories.NewAccountRepository(chatAppDB)
-	accountService := service.NewAccountService(accountRepo)
-	mailService := service.NewMailService(config.GetAppConfig().Mail, _const.MailTemplatePath)
-	//mediaService := service.NewMediaService(cld)
-	_ = service.NewMediaService(cld)
+	roomRepo := repositories.NewRoomRepository(chatAppDB)
+	// Websockets Setup
+	hub := ws.NewHub(redisCli)
+	go hub.Run()
+	g.GET("/ws/:user_id", func(c *gin.Context) {
+		userId := c.Param("user_id")
+		ws.ServeWs(c, hub, userId)
+	})
 
+	socketService := service.NewSocketService(hub)
+	userService := service.NewUserService(userRepo)
+	messageService := service.NewMessageService(messageRepo, socketService)
+	mailService := service.NewMailService(config.GetAppConfig().Mail, _const.MailTemplatePath)
+	mediaService := service.NewMediaService(cld)
+	roomService := service.NewRoomService(roomRepo)
 	authService := service.NewAuthenService(
 		service.GetJWTInstance(),
 		redisCli,
@@ -74,29 +75,22 @@ func setupHandler(s *denny.Denny) {
 			config.GetAppConfig().Authentication,
 		),
 	)
+	apiGroup.Use(middleware.HTTPAuthentication)
 	apiGroup.BrpcController(
 		controller.NewMessage(
 			messageService,
+			mediaService,
+			socketService,
+			userService,
+			roomService,
 		),
 	)
 
 	apiGroup.BrpcController(
 		controller.NewUser(
 			userService,
-		),
-	)
-	apiGroup.BrpcController(
-		controller.NewAccount(
-			accountService,
 			mailService,
 			redisCli,
 		),
 	)
-	// Websockets Setup
-	hub := ws.NewHub(userService, messageService)
-	go hub.Run()
-	g.GET("/ws/:user_id", func(c *gin.Context) {
-		userID := c.Param("user_id")
-		ws.ServeWs(c, hub, userID)
-	})
 }

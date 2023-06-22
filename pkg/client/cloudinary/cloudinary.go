@@ -43,9 +43,9 @@ func (c *cloudinaryAPI) Upload(
 	ctx context.Context,
 	in domain.UploadIn,
 ) (*uploader.UploadResult, error) {
-	resp, err := c.client.Upload.Upload(ctx, in.File, uploader.UploadParams{})
+	resp, err := c.client.Upload.Upload(ctx, in.FileData, uploader.UploadParams{})
 	if err != nil {
-		glog.Errorln("Upload cloudinary fail: ", err)
+		glog.Errorln("Push cloudinary fail: ", err)
 		return nil, err
 	}
 	return resp, nil

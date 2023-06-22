@@ -10,7 +10,7 @@ import (
 type ReceivedMessage struct {
 	Event   Event  `json:"event"`
 	Room    string `json:"room"`
-	Message *any   `json:"message"`
+	Payload *any   `json:"payload"`
 }
 
 // SocketMessage is a type for socket events which

@@ -1,8 +1,7 @@
 package ws
 
 import (
-	"chat-app/internal/service"
-	"github.com/go-redis/redis/v8"
+	redis2 "chat-app/pkg/client/redis"
 )
 
 // Hub maintains the set of active ConnectedClients and broadcasts messages to the ConnectedClients.
@@ -11,21 +10,16 @@ type Hub struct {
 	RegisterChannel   chan *Client
 	UnregisterChannel chan *Client
 	Rooms             map[*Room]bool
-	UserService       service.UserService
-	MessageService    service.MessageService
-	redisClient       *redis.Client
+	redisClient       redis2.IRedisClient
 }
 
-func NewHub(
-	userService service.UserService,
-	messageService service.MessageService,
-) *Hub {
+func NewHub(redisCli redis2.IRedisClient) *Hub {
 	return &Hub{
 		ConnectedClients:  make(map[*Client]bool),
 		RegisterChannel:   make(chan *Client),
 		UnregisterChannel: make(chan *Client),
-		UserService:       userService,
-		MessageService:    messageService,
+		Rooms:             make(map[*Room]bool),
+		redisClient:       redisCli,
 	}
 }
 
@@ -95,7 +89,8 @@ func (h *Hub) BroadcastSocketEventToAllClientExceptMe(payload []byte, myUserId s
 
 // BroadcastToRoom sends the given message to all clients connected to the given room
 func (h *Hub) BroadcastToRoom(message []byte, roomId string) {
-	if room := h.findRoomById(roomId); room != nil {
+	room := h.findRoomById(roomId)
+	if room != nil {
 		room.publishRoomMessage(message)
 	}
 }
@@ -112,10 +107,11 @@ func (h *Hub) findRoomById(id string) *Room {
 	return foundRoom
 }
 
-func (h *Hub) createRoom(id string) *Room {
-	room := NewRoom(id, h.redisClient)
-	go room.RunRoom()
+func (h *Hub) createRoom(roomId string) *Room {
+	room := NewRoom(roomId, h.redisClient)
 	h.Rooms[room] = true
+
+	go room.RunRoom()
 
 	return room
 }

@@ -7,6 +7,9 @@ const (
 	JoinRoom  Event = "JoinRoom"
 	LeaveRoom Event = "LeaveRoom"
 
+	JoinUser  Event = "JoinUser"
+	LeaveUser Event = "LeaveUser"
+
 	StartTyping Event = "StartTyping"
 	StopTyping  Event = "StopTyping"
 )

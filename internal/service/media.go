@@ -11,7 +11,7 @@ import (
 )
 
 type MediaService interface {
-	Upload(in domain.UploadIn) (*uploader.UploadResult, common.SubReturnCode)
+	Push(in domain.UploadIn) (*uploader.UploadResult, common.SubReturnCode)
 }
 
 func NewMediaService(cldClient cloudinary.CloudinaryAPI) MediaService {
@@ -24,14 +24,14 @@ type mediaServiceImpl struct {
 	cld cloudinary.CloudinaryAPI
 }
 
-func (m mediaServiceImpl) Upload(
+func (m mediaServiceImpl) Push(
 	in domain.UploadIn,
 ) (*uploader.UploadResult, common.SubReturnCode) {
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	resp, err := m.cld.Upload(ctx, in)
 	cancel()
 	if err != nil {
-		glog.Errorln("Upload fail err: ", err)
+		glog.Errorln("Push fail err: ", err)
 		return nil, common.SystemError
 	}
 	return resp, common.OK

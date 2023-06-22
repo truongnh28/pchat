@@ -8,7 +8,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"log"
 	"time"
 )
 
@@ -43,7 +42,10 @@ func (m *messageRepositoryImpl) GetChatHistoryBetweenTwoUsers(
 	recipientId string,
 	timeStart, timeEnd time.Time,
 ) ([]domain.ChatMessage, error) {
-	collection := m.database.Collection("messages")
+	var (
+		logger     = denny.GetLogger(ctx)
+		collection = m.database.Collection("messages")
+	)
 	var timeRange = bson.M{
 		"$gte": timeStart,
 		"$lte": timeEnd,
@@ -59,7 +61,8 @@ func (m *messageRepositoryImpl) GetChatHistoryBetweenTwoUsers(
 	findOptions := options.Find().SetSort(bson.D{{"time", 1}})
 	cursor, err := collection.Find(ctx, filter, findOptions)
 	if err != nil {
-		denny.GetLogger(ctx).Error("GetChatHistoryBetweenTwoUsers err: ", err)
+		logger.Error("GetChatHistoryBetweenTwoUsers err: ", err)
+		return nil, err
 	}
 	// Iterate through the cursor and print the documents
 	for cursor.Next(ctx) {
@@ -67,13 +70,15 @@ func (m *messageRepositoryImpl) GetChatHistoryBetweenTwoUsers(
 		err := cursor.Decode(&message)
 		jsonMessage, err := sonic.Marshal(message)
 		if err != nil {
-			log.Fatal(err)
+			logger.Error("marshal message err: ", err)
+			return nil, err
 		}
 		err = sonic.Unmarshal(jsonMessage, &message)
 		if err != nil {
-			log.Fatal(err)
+			logger.Error("unmarshal message err: ", err)
+			return nil, err
 		}
-		log.Println(message)
+		//log.Println(message)
 	}
 	return results, nil
 }

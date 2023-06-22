@@ -73,6 +73,7 @@ func newClient(conn *websocket.Conn, hub *Hub, username string) *Client {
 		rooms:       make(map[*Room]bool),
 	}
 }
+
 func unregisterAndCloseConnection(c *Client) {
 	c.hub.UnregisterChannel <- c
 	_ = c.wsConn.Close()
@@ -185,7 +186,7 @@ func (client *Client) handleEvent(msg []byte) {
 	}
 }
 
-//func (client *Client) handleEmitMessage(message SocketMessage) {
+//func (client *client) handleEmitMessage(message SocketMessage) {
 //	logger := denny.GetLogger(ctx).WithField("socket payload event", client.id)
 //
 //	msg := (message.Payload).(map[string]interface{})["message"].(string)
@@ -199,7 +200,7 @@ func (client *Client) handleEvent(msg []byte) {
 //	messagePacket := domain.ChatMessage{
 //		SenderID:    senderId,
 //		RecipientID: recipientId,
-//		Message:     msg,
+//		Payload:     msg,
 //		Time:        time.Now(),
 //	}
 //	err := client.hub.MessageService.CreateMessages(ctx, &messagePacket)
@@ -231,7 +232,7 @@ func (client *Client) handleJoinRoom(message ReceivedMessage) {
 	)
 	room := client.hub.findRoomById(roomId)
 	if room == nil {
-		client.hub.createRoom(roomId)
+		room = client.hub.createRoom(roomId)
 	}
 	client.rooms[room] = true
 	room.register <- client
@@ -255,7 +256,7 @@ func (client *Client) handleTypingEvent(message ReceivedMessage, event Event) {
 	if room := client.hub.findRoomById(roomID); room != nil {
 		msg := SocketMessage{
 			Event:   event,
-			Payload: message.Message,
+			Payload: message.Payload,
 		}
 		room.broadcast <- msg.Encode()
 	}

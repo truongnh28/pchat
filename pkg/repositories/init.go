@@ -52,9 +52,9 @@ func InitChatMessageDatabase() *MongoDatastore {
 		dbConfig := config.GetAppConfig().ChatMessageDatabase
 
 		connectionString := fmt.Sprintf(
-			"mongodb://%s:%s@%s:%d/%s",
-			dbConfig.Username,
-			dbConfig.Password,
+			"mongodb://%s:%d/%s",
+			//dbConfig.Username,
+			//dbConfig.Password,
 			dbConfig.Host,
 			dbConfig.Port,
 			dbConfig.DatabaseName,

@@ -14,8 +14,8 @@ type SocketService interface {
 	EmitNewMessage(ctx context.Context, roomId string, message *domain.ChatMessage)
 	EmitEditMessage(room string, message *domain.ChatMessage)
 	EmitDeleteMessage(room, messageId string)
-	EmitNewRoom(ctx context.Context, roomId string, room *domain.Room)
-	EmitEditRoom(ctx context.Context, roomId string, room *domain.Room)
+	EmitNewRoom(ctx context.Context, roomId string, room *domain.Group)
+	EmitEditRoom(ctx context.Context, roomId string, room *domain.Group)
 	EmitDeleteRoom(ctx context.Context, roomId string)
 	EmitAddMember(room string, member *domain.UserDetail)
 	EmitRemoveMember(room, memberId string)
@@ -27,8 +27,7 @@ type SocketService interface {
 }
 
 type socketService struct {
-	hub            ws.Hub
-	messageService MessageService
+	hub *ws.Hub
 }
 
 func (s *socketService) EmitEditMessage(room string, message *domain.ChatMessage) {
@@ -41,12 +40,12 @@ func (s *socketService) EmitDeleteMessage(room, messageId string) {
 	panic("implement me")
 }
 
-func (s *socketService) EmitNewRoom(ctx context.Context, roomId string, room *domain.Room) {
+func (s *socketService) EmitNewRoom(ctx context.Context, roomId string, room *domain.Group) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s *socketService) EmitEditRoom(ctx context.Context, roomId string, room *domain.Room) {
+func (s *socketService) EmitEditRoom(ctx context.Context, roomId string, room *domain.Group) {
 	//TODO implement me
 	panic("implement me")
 }
@@ -93,10 +92,9 @@ func (s *socketService) EmitRemoveFriend(userId, memberId string) {
 
 // NewSocketService is a factory function for
 // initializing a SocketService with its repository layer dependencies
-func NewSocketService(hub ws.Hub, messageService MessageService) SocketService {
+func NewSocketService(hub *ws.Hub) SocketService {
 	return &socketService{
-		hub:            hub,
-		messageService: messageService,
+		hub: hub,
 	}
 }
 

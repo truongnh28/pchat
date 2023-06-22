@@ -8,7 +8,7 @@ service Friends {
 
 service Auth {
   rpc Login(LoginRequest) returns (LoginResponse);
-  rpc Logout(LogoutRequest) returns (BasicResponse);
+  rpc Logout(EmptyRequest) returns (BasicResponse);
   rpc VerifyOtp(VerifyOtpRequest) returns (BasicResponse);
   rpc ResendOtp(ResendOtpRequest) returns (BasicResponse);
 }
@@ -19,61 +19,64 @@ service Message {
 }
 
 service User {
-  rpc GetUserDetail(UserDetailRequest) returns (UserDetailResponse);
+  rpc Create(CreateUserRequest) returns (CreateUserResponse);
+  rpc Get(GetUserRequest) returns (GetUserResponse);
+  rpc Update(UpdateUserRequest) returns (BasicResponse);
 }
 
-service Account {
-  rpc Create(CreateAccountRequest) returns (CreateAccountResponse);
-  rpc Get(GetAccountRequest) returns (GetAccountResponse);
-  rpc Update(UpdateAccountRequest) returns (BasicResponse);
+service Group {
+  rpc Create(CreateGroupRequest) returns (CreateGroupResponse);
+  rpc Get(GetGroupRequest) returns (GetGroupResponse);
+  rpc Update(UpdateGroupRequest) returns (BasicResponse);
 }
 
-message CreateAccountRequest {
+message CreateUserRequest {
   string username = 1;
   string phone_number = 2;
   string email = 3;
   string password = 4;
 }
 
-message AccountInfo {
+message UserInfo {
   string username = 1;
   string phone_number = 2;
   string email = 3;
   string status = 4;
+  string user_id = 5;
 }
 
-message CreateAccountResponse {
+message CreateUserResponse {
   int32 return_code = 1;
   string return_message = 2;
   int32 sub_return_code = 3;
   string sub_return_message = 4;
-  AccountInfo info = 5;
+  UserInfo info = 5;
 }
 
-message GetAccountRequest {
+message GetUserRequest {
   optional string username = 1;
-  optional uint64 user_id = 2;
+  optional string user_id = 2;
 }
 
-message GetAccountResponse {
+message GetUserResponse {
   int32 return_code = 1;
   string return_message = 2;
   int32 sub_return_code = 3;
   string sub_return_message = 4;
-  AccountInfo info = 5;
+  UserInfo info = 5;
 }
 
-message UpdateAccountRequest {
+message UpdateUserRequest {
   string username = 1;
   string password = 2;
 }
 
-message UpdateAccountResponse {
+message UpdateUserResponse {
   int32 return_code = 1;
   string return_message = 2;
   int32 sub_return_code = 3;
   string sub_return_message = 4;
-  AccountInfo info = 5;
+  UserInfo info = 5;
 }
 
 message Paging {
@@ -93,7 +96,7 @@ message BasicResponse {
 
 message VerifyOtpRequest {
   string email = 1;
-  string otp = 3;
+  string otp = 2;
 }
 
 message ResendOtpRequest {
@@ -128,6 +131,8 @@ message ChatMessage {
 message ChatHistoryRequest{
   string sender_id = 1;
   string recipient_id = 2;
+  string start_time = 4;
+  string end_time = 5;
 }
 
 message ChatHistoryResponse{
@@ -139,20 +144,49 @@ message ChatHistoryResponse{
   Paging paging = 6;
 }
 
-message UserDetail {
-  string username = 1;
-  string user_id = 2;
-  bool online = 3;
+
+message CreateGroupRequest {
+  string group_name = 1;
+  string avatar_url = 2;
 }
 
-message UserDetailRequest {
-  string user_id = 1;
+message GroupInfo {
+  string group_id = 1;
+  string group_name = 2;
+  string avatar_url = 3;
+  repeated string user_id = 4;
 }
 
-message UserDetailResponse {
+message CreateGroupResponse {
   int32 return_code = 1;
   string return_message = 2;
   int32 sub_return_code = 3;
   string sub_return_message = 4;
-  UserDetail user_detail = 5;
+  GroupInfo info = 5;
+}
+
+message GetGroupRequest {
+  string group_id = 1;
+}
+
+message GetGroupResponse {
+  int32 return_code = 1;
+  string return_message = 2;
+  int32 sub_return_code = 3;
+  string sub_return_message = 4;
+  GroupInfo info = 5;
+}
+
+message UpdateGroupRequest {
+  string group_id = 1;
+  string group_name = 2;
+  string avatar_url = 3;
+}
+
+message UpdateGroupResponse {
+  int32 return_code = 1;
+  string return_message = 2;
+  int32 sub_return_code = 3;
+  string sub_return_message = 4;
+  GroupInfo info = 5;
 }

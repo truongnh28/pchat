@@ -12,14 +12,13 @@ import (
 	"github.com/go-redis/redis/v8"
 	"github.com/whatvn/denny"
 	"net/http"
-	"net/url"
 	"time"
 )
 
 type auth struct {
-	authService service.AuthenService
+	authService service.AuthService
 	config      *config.AuthenticationConfig
-	redisCli    *cache.RedisClient
+	redisCli    cache.IRedisClient
 	mailService service.MailService
 }
 
@@ -28,8 +27,8 @@ func (a *auth) ResendOtp(
 	request *chat_app.ResendOtpRequest,
 ) (resp *chat_app.BasicResponse, err error) {
 	var (
-		errCode   = common.OK
-		_, logger = helper.GetAccountAndLogger(ctx)
+		errCode = common.OK
+		logger  = denny.GetLogger(ctx)
 	)
 	defer func() {
 		buildResponse(errCode, resp)
@@ -68,13 +67,13 @@ func (a *auth) ResendOtp(
 
 func (a *auth) Logout(
 	ctx context.Context,
-	request *chat_app.LogoutRequest,
+	request *chat_app.EmptyRequest,
 ) (resp *chat_app.BasicResponse, err error) {
 	var (
-		errCode   = common.OK
-		_, logger = helper.GetAccountAndLogger(ctx)
-		ok        = false
-		httpCtx   *denny.Context
+		errCode = common.OK
+		logger  = denny.GetLogger(ctx)
+		ok      = false
+		httpCtx *denny.Context
 	)
 	defer func() {
 		buildResponse(errCode, resp)
@@ -102,9 +101,9 @@ func (a *auth) VerifyOtp(
 	request *chat_app.VerifyOtpRequest,
 ) (resp *chat_app.BasicResponse, err error) {
 	var (
-		errCode   = common.OK
-		_, logger = helper.GetAccountAndLogger(ctx)
-		ok        = false
+		errCode = common.OK
+		logger  = denny.GetLogger(ctx)
+		ok      = false
 	)
 	defer func() {
 		buildResponse(errCode, resp)
@@ -130,10 +129,10 @@ func (a *auth) Login(
 	request *chat_app.LoginRequest,
 ) (resp *chat_app.LoginResponse, err error) {
 	var (
-		errCode   = common.OK
-		_, logger = helper.GetAccountAndLogger(ctx)
-		httpCtx   *denny.Context
-		ok        = false
+		errCode = common.OK
+		logger  = denny.GetLogger(ctx)
+		httpCtx *denny.Context
+		ok      = false
 	)
 	defer func() {
 		buildResponse(errCode, resp)
@@ -149,30 +148,23 @@ func (a *auth) Login(
 	resp, err = a.authService.Login(ctx, request)
 
 	if err != nil {
-		errCode = common.SystemError
+		errCode = common.InvalidRequest
 		logger.WithError(err).Errorln("authen service fail")
 		return
 	}
-	originURL, err := url.Parse(httpCtx.GetHeader("origin"))
-	if err != nil {
-		httpCtx.AbortWithStatus(http.StatusNoContent)
-		return
-	}
-	originHostName := originURL.Hostname()
-	logger.Infoln("originHostName: ", originHostName)
-	httpCtx.SetSameSite(http.SameSiteNoneMode)
+
 	httpCtx.SetCookie(
 		common.CookieName,
 		resp.AccessToken,
-		int(a.config.ExpiredTime), "/", a.config.CookiePath,
-		a.config.CookieSecure, false)
+		int(a.config.ExpiredTime), "/", "",
+		httpCtx.Request.TLS != nil, false)
 	resp.AccessToken = ""
 	return
 }
 
 func NewAuth(
-	authService service.AuthenService,
-	redisCli *cache.RedisClient,
+	authService service.AuthService,
+	redisCli cache.IRedisClient,
 	mailService service.MailService,
 	authConfig *config.AuthenticationConfig,
 ) chat_app.AuthServer {

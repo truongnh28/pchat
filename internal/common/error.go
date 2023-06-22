@@ -39,3 +39,12 @@ func ConvertErrorToCustomError(err error) (*CustomError, bool) {
 	}
 	return WrapError(SystemError, err), false
 }
+
+type LoginError error
+
+var (
+	InvalidAccount   = errors.New("account not valid")
+	BlockedAccount   = errors.New("account has been blocked")
+	LoginInfoInvalid = errors.New("wrong login information")
+	LoginSystemError = errors.New("system error")
+)

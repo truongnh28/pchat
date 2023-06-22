@@ -25,7 +25,7 @@ func GetJWTInstance() auth.JWTAuth {
 
 func getInfoFromToken(dt string) (interface{}, error) {
 	var (
-		acc = &domain.Account{}
+		acc = &domain.User{}
 		err error
 	)
 	err = json.Unmarshal([]byte(dt), acc)

@@ -1,10 +1,3 @@
-COVERAGE := TRUE
-DISPLAY_COVERAGE := TRUE
-HTML_FILE:= coverage.html
-JUNIT_FILE:= rspec.xml
-COBERTURA_FILE:= coverage.xml
-REPORT_PATH:= ./test-reports
-
 gen:
 	## Go generate
 	@go generate ./...

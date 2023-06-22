@@ -26,9 +26,8 @@ func HTTPAuthentication(ctx *gin.Context) {
 		ctx.AbortWithStatus(401)
 		return
 	}
-	actor := dt.(*domain.Account)
-	glog.Infoln("actor", actor)
-	ctx.Set("actor", actor)
+	actor := dt.(*domain.User)
+	ctx.Set("actor", actor.UserId)
 
 	ctx.Next()
 }

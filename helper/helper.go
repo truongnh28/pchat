@@ -8,8 +8,8 @@ import (
 
 const ActorCtxKey = "actor"
 
-func getActorFromContext(ctx context.Context) (string, bool) {
-	if ctx, ok := ctx.(*denny.Context); ok {
+func getActorFromContext(context context.Context) (string, bool) {
+	if ctx, ok := context.(*denny.Context); ok {
 		iActor, ok := ctx.Get(ActorCtxKey)
 		if !ok {
 			return "", false
@@ -17,14 +17,14 @@ func getActorFromContext(ctx context.Context) (string, bool) {
 		return iActor.(string), true
 	}
 
-	iActor := ctx.Value(ActorCtxKey)
+	iActor := context.Value(ActorCtxKey)
 	if iActor == nil {
 		return "", false
 	}
 	return iActor.(string), true
 }
 
-func GetAccountAndLogger(ctx context.Context) (string, *log.Log) {
+func GetUserAndLogger(ctx context.Context) (string, *log.Log) {
 	actor, _ := getActorFromContext(ctx)
 	logger := denny.GetLogger(ctx).WithField("actor", actor)
 	return actor, logger
