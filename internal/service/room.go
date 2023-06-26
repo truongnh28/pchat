@@ -13,7 +13,7 @@ import (
 type RoomService interface {
 	Create(
 		ctx context.Context,
-		req domain.Room,
+		request domain.Room,
 	) common.SubReturnCode
 	Get(
 		ctx context.Context,
@@ -25,7 +25,7 @@ type roomService struct {
 	roomRepository repositories.RoomRepository
 }
 
-func (a *roomService) Get(
+func (r *roomService) Get(
 	ctx context.Context,
 	req domain.Room,
 ) ([]domain.Room, common.SubReturnCode) {
@@ -35,10 +35,10 @@ func (a *roomService) Get(
 		resp   = make([]domain.Room, 0)
 		logger = denny.GetLogger(ctx)
 	)
-	if req.GroupId == "" || req.UserId == "" {
+	if req.GroupId == "" && req.UserId == "" {
 		return resp, common.SystemError
 	}
-	rooms, err = a.roomRepository.Get(ctx, req)
+	rooms, err = r.roomRepository.Get(ctx, req)
 	if err != nil {
 		glog.Errorf("Find Room fail: %s", err)
 		logger.WithError(err)
@@ -53,24 +53,26 @@ func (a *roomService) Get(
 	return resp, common.OK
 }
 
-func (a *roomService) Create(
+func (r *roomService) Create(
 	ctx context.Context,
-	req domain.Room,
+	request domain.Room,
 ) common.SubReturnCode {
 	var (
+		err    = error(nil)
 		logger = denny.GetLogger(ctx)
 	)
-	acc := models.Room{
-		GroupId: req.GroupId,
-		UserId:  req.UserId,
+	if request.GroupId == "" || request.UserId == "" {
+		logger.WithError(err).Errorf("invalid request: %s", err)
+		return common.InvalidRequest
 	}
-
-	err := a.roomRepository.Create(ctx, acc)
+	err = r.roomRepository.Create(ctx, models.Room{
+		GroupId: request.GroupId,
+		UserId:  request.UserId,
+	})
 	if err != nil {
-		logger.Errorln("Create Room service err: ", err)
+		logger.WithError(err).Errorf("create room fail: %s", err)
 		return common.SystemError
 	}
-
 	return common.OK
 }
 

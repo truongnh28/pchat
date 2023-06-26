@@ -5,9 +5,7 @@ import (
 	"chat-app/internal/domain"
 	"chat-app/models"
 	"chat-app/pkg/repositories"
-	chat_app "chat-app/proto/chat-app"
 	"context"
-	"github.com/golang/glog"
 	"github.com/google/uuid"
 	"github.com/whatvn/denny"
 )
@@ -15,83 +13,133 @@ import (
 type GroupService interface {
 	Create(
 		ctx context.Context,
-		req *chat_app.CreateGroupRequest,
-	) (*chat_app.CreateGroupResponse, common.SubReturnCode)
+		name string,
+	) (*domain.Group, common.SubReturnCode)
 	Get(
 		ctx context.Context,
-		req *chat_app.GetGroupRequest,
-	) (*chat_app.GetGroupResponse, common.SubReturnCode)
+		groupId string,
+	) (*domain.Group, common.SubReturnCode)
+	Update(
+		ctx context.Context,
+		request domain.Group,
+	) common.SubReturnCode
+	Delete(ctx context.Context, groupId string) common.SubReturnCode
 }
 
 type groupService struct {
 	groupRepository repositories.GroupRepository
 	roomRepository  repositories.RoomRepository
+	fileService     FileService
 }
 
-func (a *groupService) Get(
+func (g *groupService) Delete(ctx context.Context, groupId string) common.SubReturnCode {
+	logger := denny.GetLogger(ctx)
+
+	err := g.groupRepository.Delete(ctx, groupId)
+	if err != nil {
+		logger.WithError(err).Errorln("delete group fail: ", err)
+		return common.SystemError
+	}
+
+	return common.OK
+}
+
+func (g *groupService) Update(
 	ctx context.Context,
-	req *chat_app.GetGroupRequest,
-) (*chat_app.GetGroupResponse, common.SubReturnCode) {
+	request domain.Group,
+) common.SubReturnCode {
 	var (
-		acc     = &models.Group{}
+		err    = error(nil)
+		logger = denny.GetLogger(ctx)
+	)
+	group, err := g.groupRepository.Get(ctx, request.Id)
+	if err != nil {
+		logger.WithError(err).Errorln("get group in repository fail: ", err)
+		return common.SystemError
+	}
+	err = g.groupRepository.Update(ctx, models.Group{
+		GroupId: request.Id,
+		Name:    request.Name,
+		FileId:  request.ImageId,
+	})
+	if err != nil {
+		logger.WithError(err).Errorln("update group in repository fail: ", err)
+		return common.SystemError
+	}
+	if request.ImageId != 0 {
+		errCode := g.fileService.Delete(ctx, group.FileId)
+		if errCode != common.OK {
+			logger.Errorln("delete file fail")
+			return errCode
+		}
+	}
+	return common.OK
+}
+
+func (g *groupService) Get(
+	ctx context.Context,
+	groupId string,
+) (*domain.Group, common.SubReturnCode) {
+	var (
+		group   = &models.Group{}
 		err     = error(nil)
-		resp    = &chat_app.GetGroupResponse{}
+		resp    = &domain.Group{}
 		logger  = denny.GetLogger(ctx)
 		userIds = make([]string, 0)
 	)
-	if req.GetGroupId() == "" {
-		return resp, common.SystemError
-	}
-	acc, err = a.groupRepository.Get(ctx, req.GetGroupId())
+	group, err = g.groupRepository.Get(ctx, groupId)
 	if err != nil {
-		glog.Errorf("find group fail: %s", err)
-		logger.WithError(err)
+		logger.WithError(err).Errorf("find group fail: %s", err)
 		return resp, common.SystemError
 	}
-	rooms, err := a.roomRepository.Get(ctx, domain.Room{
-		GroupId: req.GetGroupId(),
+	rooms, err := g.roomRepository.Get(ctx, domain.Room{
+		GroupId: groupId,
 	})
 	if err != nil {
-		glog.Errorf("get room fail: %s", err)
-		logger.WithError(err)
+		logger.WithError(err).Errorf("get room fail: %s", err)
 		return resp, common.SystemError
 	}
 	for _, room := range rooms {
 		userIds = append(userIds, room.UserId)
 	}
-	resp.Info = &chat_app.GroupInfo{
-		GroupId:   req.GroupId,
-		GroupName: acc.Name,
-		AvatarUrl: acc.AvatarUrl,
-		UserId:    userIds,
+	file, errCode := g.fileService.Get(ctx, group.FileId)
+	if errCode != common.OK {
+		logger.WithError(err).Errorf("get room fail: %s", err)
+		return resp, common.SystemError
 	}
+	resp = &domain.Group{
+		Id:       groupId,
+		Name:     group.Name,
+		ImageUrl: file.SecureURL,
+		UserId:   userIds,
+	}
+
 	return resp, common.OK
 }
 
-func (a *groupService) Create(
+func (g *groupService) Create(
 	ctx context.Context,
-	req *chat_app.CreateGroupRequest,
-) (*chat_app.CreateGroupResponse, common.SubReturnCode) {
+	name string,
+) (*domain.Group, common.SubReturnCode) {
 	var (
-		resp       = &chat_app.CreateGroupResponse{}
+		resp       = &domain.Group{}
 		logger     = denny.GetLogger(ctx)
 		groupId, _ = uuid.NewUUID()
 	)
 	acc := models.Group{
-		GroupId:   groupId.String(),
-		Name:      req.GetGroupName(),
-		AvatarUrl: req.GetAvatarUrl(),
+		GroupId: groupId.String(),
+		Name:    name,
+		FileId:  1,
 	}
 
-	err := a.groupRepository.Create(ctx, acc)
+	err := g.groupRepository.Create(ctx, acc)
 	if err != nil {
 		logger.Errorln("Create Group service err: ", err)
 		return resp, common.SystemError
 	}
-	resp.Info = &chat_app.GroupInfo{
-		GroupId:   groupId.String(),
-		GroupName: req.GetGroupName(),
-		AvatarUrl: req.GetAvatarUrl(),
+	resp = &domain.Group{
+		Id:   acc.GroupId,
+		Name: acc.Name,
 	}
 	return resp, common.OK
 }
@@ -99,9 +147,11 @@ func (a *groupService) Create(
 func NewGroupService(
 	groupRepository repositories.GroupRepository,
 	roomRepository repositories.RoomRepository,
+	fileService FileService,
 ) GroupService {
 	return &groupService{
 		groupRepository: groupRepository,
 		roomRepository:  roomRepository,
+		fileService:     fileService,
 	}
 }

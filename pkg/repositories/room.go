@@ -11,16 +11,28 @@ type RoomRepository interface {
 	Create(ctx context.Context, req models.Room) error
 	Get(ctx context.Context, req domain.Room) ([]*models.Room, error)
 	Update(ctx context.Context, req models.Room) error
-	Delete(ctx context.Context, req models.Room) error
+	DeleteByGroupId(ctx context.Context, groupId string) error
+	DeleteByUserId(ctx context.Context, userId string) error
 }
 
 type roomRepository struct {
 	database *gorm.DB
 }
 
-func (g *roomRepository) Delete(ctx context.Context, req models.Room) error {
-	//TODO implement me
-	panic("implement me")
+func (g *roomRepository) DeleteByGroupId(ctx context.Context, groupId string) error {
+	return g.database.WithContext(ctx).
+		Model(models.Room{}).
+		Where("group_id = ?", groupId).
+		Delete(models.Room{}).
+		Error
+}
+
+func (g *roomRepository) DeleteByUserId(ctx context.Context, userId string) error {
+	return g.database.WithContext(ctx).
+		Model(models.Room{}).
+		Where("user_id = ?", userId).
+		Delete(models.Room{}).
+		Error
 }
 
 func (g *roomRepository) Update(ctx context.Context, req models.Room) error {

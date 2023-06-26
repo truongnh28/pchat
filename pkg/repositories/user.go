@@ -61,12 +61,12 @@ func (a *userRepository) Validate(
 	return nil
 }
 
-func (a *userRepository) Get(ctx context.Context, id string) (*models.User, error) {
+func (a *userRepository) Get(ctx context.Context, userId string) (*models.User, error) {
 	userProfiles := &models.User{}
 	err := a.database.WithContext(ctx).
 		Model(models.User{}).
-		Where("id = ?", id).
-		Find(&userProfiles).
+		Where("user_id = ?", userId).
+		First(&userProfiles).
 		Error
 	return userProfiles, err
 }

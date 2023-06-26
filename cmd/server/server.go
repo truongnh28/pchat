@@ -47,6 +47,8 @@ func setupHandler(s *denny.Denny) {
 	accountRepo := repositories.NewUserRepository(chatAppDB)
 	messageRepo := repositories.NewMessageRepository(chatMessageDB.DB)
 	roomRepo := repositories.NewRoomRepository(chatAppDB)
+	groupRepo := repositories.NewGroupRepository(chatAppDB)
+	fileRepo := repositories.NewFileRepository(chatAppDB)
 	// Websockets Setup
 	hub := ws.NewHub(redisCli)
 	go hub.Run()
@@ -56,11 +58,12 @@ func setupHandler(s *denny.Denny) {
 	})
 
 	socketService := service.NewSocketService(hub)
-	userService := service.NewUserService(userRepo)
 	messageService := service.NewMessageService(messageRepo, socketService)
 	mailService := service.NewMailService(config.GetAppConfig().Mail, _const.MailTemplatePath)
-	mediaService := service.NewMediaService(cld)
+	fileService := service.NewFileService(cld, fileRepo)
+	userService := service.NewUserService(userRepo, fileService)
 	roomService := service.NewRoomService(roomRepo)
+	groupService := service.NewGroupService(groupRepo, roomRepo, fileService)
 	authService := service.NewAuthenService(
 		service.GetJWTInstance(),
 		redisCli,
@@ -70,6 +73,7 @@ func setupHandler(s *denny.Denny) {
 	apiGroup.BrpcController(
 		controller.NewAuth(
 			authService,
+			userService,
 			redisCli,
 			mailService,
 			config.GetAppConfig().Authentication,
@@ -79,7 +83,7 @@ func setupHandler(s *denny.Denny) {
 	apiGroup.BrpcController(
 		controller.NewMessage(
 			messageService,
-			mediaService,
+			fileService,
 			socketService,
 			userService,
 			roomService,
@@ -89,8 +93,15 @@ func setupHandler(s *denny.Denny) {
 	apiGroup.BrpcController(
 		controller.NewUser(
 			userService,
-			mailService,
-			redisCli,
+		),
+	)
+
+	apiGroup.BrpcController(
+		controller.NewGroup(
+			userService,
+			groupService,
+			roomService,
+			fileService,
 		),
 	)
 }

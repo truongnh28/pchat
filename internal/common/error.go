@@ -48,3 +48,11 @@ var (
 	LoginInfoInvalid = errors.New("wrong login information")
 	LoginSystemError = errors.New("system error")
 )
+
+type FormDataError error
+
+var (
+	GetHttpCtxFail = errors.New("get httpCtx fail")
+	FiledInvalid   = errors.New("field is valid")
+	ParseDataFail  = errors.New("cloud not parse form data")
+)

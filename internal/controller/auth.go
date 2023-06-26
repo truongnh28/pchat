@@ -11,7 +11,6 @@ import (
 	"errors"
 	"github.com/go-redis/redis/v8"
 	"github.com/whatvn/denny"
-	"net/http"
 	"time"
 )
 
@@ -20,6 +19,58 @@ type auth struct {
 	config      *config.AuthenticationConfig
 	redisCli    cache.IRedisClient
 	mailService service.MailService
+	userService service.UserService
+}
+
+func (a *auth) Register(
+	ctx context.Context,
+	request *chat_app.RegisterRequest,
+) (resp *chat_app.RegisterResponse, err error) {
+	var (
+		errCode   = common.OK
+		_, logger = helper.GetUserAndLogger(ctx)
+	)
+	defer func() {
+		buildResponse(errCode, resp)
+		err = nil
+	}()
+	resp = new(chat_app.RegisterResponse)
+
+	passwordHash, err := helper.HashPassword(request.Password)
+	if err != nil {
+		logger.WithError(err).Errorln("hash password fail")
+		errCode = common.SystemError
+		return
+	}
+	opt, err := helper.GenOtp(config.GetAppConfig().Authentication.SecretKey)
+	if err != nil {
+		logger.WithError(err).Errorln("gen otp fail")
+		errCode = common.SystemError
+		return
+	}
+
+	err = a.redisCli.Set(ctx, request.GetEmail(), opt, time.Minute*5).Err()
+	if err != nil {
+		logger.WithError(err).Errorln("gen otp fail")
+		errCode = common.SystemError
+		return
+	}
+
+	request.Password = passwordHash
+	resp, errCode = a.userService.Create(ctx, request)
+	if errCode != common.OK {
+		logger.WithError(err).Error("create user fail")
+		return
+	}
+
+	err = a.mailService.SendOpt([]string{request.GetEmail()}, opt)
+	if err != nil {
+		logger.WithError(err).Error("send otp fail")
+		errCode = common.SystemError
+		return
+	}
+
+	return
 }
 
 func (a *auth) ResendOtp(
@@ -82,17 +133,14 @@ func (a *auth) Logout(
 
 	resp = new(chat_app.BasicResponse)
 	httpCtx, ok = ctx.(*denny.Context)
-	if !ok {
-		errCode = common.SystemError
-		logger.WithError(errors.New("get httpCtx fail"))
-		return
+	logger.Infoln("Logout...")
+	if ok {
+		httpCtx.SetCookie(
+			a.config.CookieName,
+			"", 0, "/", "",
+			httpCtx.Request.TLS != nil, false)
 	}
-	logger.Infoln("set cookie is empty")
-	httpCtx.SetSameSite(http.SameSiteNoneMode)
-	httpCtx.SetCookie(
-		common.CookieName,
-		"", 0, "/", a.config.CookiePath,
-		a.config.CookieSecure, false)
+
 	return
 }
 
@@ -119,6 +167,12 @@ func (a *auth) VerifyOtp(
 	if !ok {
 		errCode = common.ValidationError
 		logger.Infoln("validate otp fail")
+		return
+	}
+	err = a.redisCli.Del(ctx, request.GetEmail()).Err()
+	if err != nil && err != redis.Nil {
+		errCode = common.SystemError
+		logger.WithError(err).Errorln("delete key err: ", err)
 		return
 	}
 	return
@@ -164,12 +218,14 @@ func (a *auth) Login(
 
 func NewAuth(
 	authService service.AuthService,
+	userService service.UserService,
 	redisCli cache.IRedisClient,
 	mailService service.MailService,
 	authConfig *config.AuthenticationConfig,
 ) chat_app.AuthServer {
 	return &auth{
 		authService: authService,
+		userService: userService,
 		config:      authConfig,
 		redisCli:    redisCli,
 		mailService: mailService,

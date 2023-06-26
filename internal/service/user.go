@@ -1,13 +1,13 @@
 package service
 
 import (
+	"chat-app/helper"
 	"chat-app/internal/common"
 	"chat-app/internal/domain"
 	"chat-app/models"
 	"chat-app/pkg/repositories"
 	chat_app "chat-app/proto/chat-app"
 	"context"
-	"github.com/golang/glog"
 	"github.com/google/uuid"
 	"github.com/whatvn/denny"
 	"strings"
@@ -16,8 +16,8 @@ import (
 type UserService interface {
 	Create(
 		ctx context.Context,
-		req *chat_app.CreateUserRequest,
-	) (*chat_app.CreateUserResponse, common.SubReturnCode)
+		req *chat_app.RegisterRequest,
+	) (*chat_app.RegisterResponse, common.SubReturnCode)
 	UpdatePassword(
 		ctx context.Context,
 		req *chat_app.UpdateUserRequest,
@@ -34,6 +34,7 @@ type UserService interface {
 
 type userService struct {
 	userRepository repositories.UserRepository
+	fileService    FileService
 }
 
 func (a *userService) GetByUserId(
@@ -82,16 +83,24 @@ func (a *userService) Get(
 		acc, err = a.userRepository.FindByUserName(ctx, req.GetUsername())
 	}
 	if err != nil {
-		glog.Errorf("Find user fail: %s", err)
-		logger.WithError(err)
+		logger.WithError(err).Errorf("Find user fail: %s", err)
+		return resp, common.SystemError
+	}
+
+	file, errCode := a.fileService.Get(ctx, acc.FileId)
+	if errCode != common.OK {
+		logger.Errorf("Find user file fail: %d", errCode)
 		return resp, common.SystemError
 	}
 	resp.Info = &chat_app.UserInfo{
-		UserId:      req.GetUserId(),
 		Username:    acc.UserName,
 		PhoneNumber: acc.Email,
 		Email:       acc.PhoneNumber,
 		Status:      string(acc.Status),
+		UserId:      req.GetUserId(),
+		DateOfBirth: helper.FromTimeToString(acc.DateOfBirth, helper.ApiClientDateFormat),
+		Gender:      acc.Gender.String(),
+		Url:         file.GetSecureURL(),
 	}
 	return resp, common.OK
 }
@@ -119,13 +128,18 @@ func (a *userService) UpdatePassword(
 
 func (a *userService) Create(
 	ctx context.Context,
-	req *chat_app.CreateUserRequest,
-) (*chat_app.CreateUserResponse, common.SubReturnCode) {
+	req *chat_app.RegisterRequest,
+) (*chat_app.RegisterResponse, common.SubReturnCode) {
 	var (
-		resp      = &chat_app.CreateUserResponse{}
-		logger    = denny.GetLogger(ctx)
-		userId, _ = uuid.NewUUID()
+		resp             = &chat_app.RegisterResponse{}
+		logger           = denny.GetLogger(ctx)
+		userId, _        = uuid.NewUUID()
+		dateOfBirth, err = helper.ParseLocalTime(helper.ApiClientDateFormat, req.DateOfBirth)
 	)
+	if err != nil {
+		logger.WithError(err).Errorln("convert time err: ", err)
+		return resp, common.SystemError
+	}
 	acc := models.User{
 		UserId:      userId.String(),
 		UserName:    req.GetUsername(),
@@ -133,8 +147,11 @@ func (a *userService) Create(
 		PhoneNumber: req.GetPhoneNumber(),
 		Password:    req.GetPassword(),
 		Status:      models.Blocked,
+		DateOfBirth: dateOfBirth,
+		Gender:      helper.ConvertToGenderType(req.Gender),
+		FileId:      1,
 	}
-	err := a.userRepository.Validate(ctx, acc)
+	err = a.userRepository.Validate(ctx, acc)
 	if err != nil {
 		errStr := "Create User service err: "
 		if strings.Contains(err.Error(), "is exist") {
@@ -160,8 +177,10 @@ func (a *userService) Create(
 
 func NewUserService(
 	userRepository repositories.UserRepository,
+	fileService FileService,
 ) UserService {
 	return &userService{
 		userRepository: userRepository,
+		fileService:    fileService,
 	}
 }

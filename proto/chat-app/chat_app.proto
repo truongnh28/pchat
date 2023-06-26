@@ -11,6 +11,7 @@ service Auth {
   rpc Logout(EmptyRequest) returns (BasicResponse);
   rpc VerifyOtp(VerifyOtpRequest) returns (BasicResponse);
   rpc ResendOtp(ResendOtpRequest) returns (BasicResponse);
+  rpc Register(RegisterRequest) returns (RegisterResponse);
 }
 
 service Message {
@@ -19,22 +20,25 @@ service Message {
 }
 
 service User {
-  rpc Create(CreateUserRequest) returns (CreateUserResponse);
   rpc Get(GetUserRequest) returns (GetUserResponse);
   rpc Update(UpdateUserRequest) returns (BasicResponse);
 }
 
 service Group {
   rpc Create(CreateGroupRequest) returns (CreateGroupResponse);
-  rpc Get(GetGroupRequest) returns (GetGroupResponse);
-  rpc Update(UpdateGroupRequest) returns (BasicResponse);
+  rpc Get(GroupRequest) returns (GetGroupResponse);
+  rpc Update(EmptyRequest) returns (UpdateGroupResponse);
+  rpc JoinGroup(JoinGroupRequest) returns (BasicResponse);
+  rpc Delete(GroupRequest) returns (BasicResponse);
 }
 
-message CreateUserRequest {
+message RegisterRequest {
   string username = 1;
   string phone_number = 2;
   string email = 3;
   string password = 4;
+  string date_of_birth = 5;
+  string gender = 6;
 }
 
 message UserInfo {
@@ -43,9 +47,12 @@ message UserInfo {
   string email = 3;
   string status = 4;
   string user_id = 5;
+  string date_of_birth = 6;
+  string gender = 7;
+  string url = 8;
 }
 
-message CreateUserResponse {
+message RegisterResponse {
   int32 return_code = 1;
   string return_message = 2;
   int32 sub_return_code = 3;
@@ -129,7 +136,6 @@ message ChatMessage {
 }
 
 message ChatHistoryRequest{
-  string sender_id = 1;
   string recipient_id = 2;
   string start_time = 4;
   string end_time = 5;
@@ -147,7 +153,6 @@ message ChatHistoryResponse{
 
 message CreateGroupRequest {
   string group_name = 1;
-  string avatar_url = 2;
 }
 
 message GroupInfo {
@@ -165,7 +170,7 @@ message CreateGroupResponse {
   GroupInfo info = 5;
 }
 
-message GetGroupRequest {
+message GroupRequest {
   string group_id = 1;
 }
 
@@ -177,16 +182,14 @@ message GetGroupResponse {
   GroupInfo info = 5;
 }
 
-message UpdateGroupRequest {
-  string group_id = 1;
-  string group_name = 2;
-  string avatar_url = 3;
-}
-
 message UpdateGroupResponse {
   int32 return_code = 1;
   string return_message = 2;
   int32 sub_return_code = 3;
   string sub_return_message = 4;
   GroupInfo info = 5;
+}
+
+message JoinGroupRequest {
+  string group_id = 1;
 }

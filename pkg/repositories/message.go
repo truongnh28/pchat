@@ -15,6 +15,7 @@ type MessageRepository interface {
 	StoreNewChatMessages(ctx context.Context, chatMessage *domain.ChatMessage) error
 	GetChatHistoryBetweenTwoUsers(
 		ctx context.Context,
+		isGroup bool,
 		senderId string,
 		recipientId string,
 		timeStart, timeEnd time.Time,
@@ -38,6 +39,7 @@ func (m *messageRepositoryImpl) StoreNewChatMessages(
 
 func (m *messageRepositoryImpl) GetChatHistoryBetweenTwoUsers(
 	ctx context.Context,
+	isGroup bool,
 	senderId string,
 	recipientId string,
 	timeStart, timeEnd time.Time,
@@ -52,9 +54,16 @@ func (m *messageRepositoryImpl) GetChatHistoryBetweenTwoUsers(
 	}
 
 	var filter = bson.M{
-		"senderID":    senderId,
-		"recipientID": recipientId,
+		"senderid":    senderId,
+		"recipientid": recipientId,
 		"time":        timeRange,
+	}
+
+	if isGroup {
+		filter = bson.M{
+			"recipientid": recipientId,
+			"time":        timeRange,
+		}
 	}
 
 	var results []domain.ChatMessage
@@ -64,7 +73,6 @@ func (m *messageRepositoryImpl) GetChatHistoryBetweenTwoUsers(
 		logger.Error("GetChatHistoryBetweenTwoUsers err: ", err)
 		return nil, err
 	}
-	// Iterate through the cursor and print the documents
 	for cursor.Next(ctx) {
 		var message domain.ChatMessage
 		err := cursor.Decode(&message)
@@ -78,7 +86,7 @@ func (m *messageRepositoryImpl) GetChatHistoryBetweenTwoUsers(
 			logger.Error("unmarshal message err: ", err)
 			return nil, err
 		}
-		//log.Println(message)
+		results = append(results, message)
 	}
 	return results, nil
 }

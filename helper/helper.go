@@ -1,31 +1,40 @@
 package helper
 
-import (
-	"context"
-	"github.com/whatvn/denny"
-	"github.com/whatvn/denny/log"
+import "strings"
+
+type GenderType uint8
+
+const (
+	Male GenderType = iota
+	Female
 )
 
-const ActorCtxKey = "actor"
-
-func getActorFromContext(context context.Context) (string, bool) {
-	if ctx, ok := context.(*denny.Context); ok {
-		iActor, ok := ctx.Get(ActorCtxKey)
-		if !ok {
-			return "", false
-		}
-		return iActor.(string), true
+func (rt GenderType) String() string {
+	switch rt {
+	case Male:
+		return "male"
+	case Female:
+		return "female"
 	}
-
-	iActor := context.Value(ActorCtxKey)
-	if iActor == nil {
-		return "", false
-	}
-	return iActor.(string), true
+	panic("invalid gender type")
 }
 
-func GetUserAndLogger(ctx context.Context) (string, *log.Log) {
-	actor, _ := getActorFromContext(ctx)
-	logger := denny.GetLogger(ctx).WithField("actor", actor)
-	return actor, logger
+func ConvertToGenderType(s string) GenderType {
+	switch strings.ToLower(s) {
+	case "male":
+		return Male
+	case "female":
+		return Female
+	}
+	panic("invalid redis type")
+}
+
+func SafeConvertToGenderType(s string) (rType GenderType, ok bool) {
+	defer func() {
+		if r := recover(); r != nil {
+			ok = false
+		}
+	}()
+
+	return ConvertToGenderType(s), true
 }

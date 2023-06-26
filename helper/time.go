@@ -9,6 +9,7 @@ type TimeFormatString string
 
 const APIClientDateTimeFormat TimeFormatString = "02/01/2006 15:04:05"
 const ApiClientTimeFormat TimeFormatString = "15:04:05"
+const ApiClientDateFormat TimeFormatString = "02/01/2006"
 
 func (t TimeFormatString) IsValid() bool {
 	switch t {

@@ -5,6 +5,7 @@ import (
 	"chat-app/internal/domain"
 	"chat-app/pkg/repositories"
 	"context"
+	"github.com/whatvn/denny"
 	"time"
 )
 
@@ -12,9 +13,10 @@ import (
 type MessageService interface {
 	GetChatHistory(
 		ctx context.Context,
+		isGroup bool,
 		senderId, recipientId string,
 		startTime, endTime time.Time,
-	) ([]*domain.ChatMessage, common.SubReturnCode)
+	) ([]domain.ChatMessage, common.SubReturnCode)
 	CreateMessages(
 		ctx context.Context,
 		roomId string,
@@ -46,11 +48,27 @@ func (m *messageServiceImpl) CreateMessages(
 
 func (m *messageServiceImpl) GetChatHistory(
 	ctx context.Context,
+	isGroup bool,
 	senderId, recipientId string,
 	startTime, endTime time.Time,
-) ([]*domain.ChatMessage, common.SubReturnCode) {
-	//TODO implement me
-	panic("implement me")
+) ([]domain.ChatMessage, common.SubReturnCode) {
+	var (
+		logger       = denny.GetLogger(ctx)
+		chatMessages = make([]domain.ChatMessage, 0)
+	)
+	resp, err := m.messageRepository.GetChatHistoryBetweenTwoUsers(
+		ctx,
+		isGroup,
+		senderId,
+		recipientId,
+		startTime,
+		endTime,
+	)
+	if err != nil {
+		logger.WithError(err).Errorln("get chat history fail: ", err)
+		return chatMessages, common.SystemError
+	}
+	return resp, common.OK
 }
 
 func NewMessageService(

@@ -11,18 +11,18 @@ type NotificationService interface {
 }
 
 func NewNotificationService(fb firebase.Firebase, userService UserService) NotificationService {
-	return &notificationServiceImpl{
+	return &notificationService{
 		fb:          fb,
 		userService: userService,
 	}
 }
 
-type notificationServiceImpl struct {
+type notificationService struct {
 	fb          firebase.Firebase
 	userService UserService
 }
 
-func (m notificationServiceImpl) Push(
+func (m notificationService) Push(
 	in domain.Notification,
 ) common.SubReturnCode {
 
