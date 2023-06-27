@@ -117,6 +117,7 @@ message LogoutRequest {
 message LoginRequest {
   string phone_number = 1;
   string password = 2;
+  string device_token = 3;
 }
 
 message LoginResponse {

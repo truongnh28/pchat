@@ -186,45 +186,6 @@ func (client *Client) handleEvent(msg []byte) {
 	}
 }
 
-//func (client *client) handleEmitMessage(message SocketMessage) {
-//	logger := denny.GetLogger(ctx).WithField("socket payload event", client.id)
-//
-//	msg := (message.Payload).(map[string]interface{})["message"].(string)
-//	senderId := (message.Payload).(map[string]interface{})["senderId"].(string)
-//	recipientId := (message.Payload).(map[string]interface{})["recipientId"].(string)
-//	if !(msg != "" && senderId != "" && recipientId != "") {
-//		logger.WithError(errors.New("get data from payload fail")).
-//			Error("get data from payload fail")
-//		return
-//	}
-//	messagePacket := domain.ChatMessage{
-//		SenderID:    senderId,
-//		RecipientID: recipientId,
-//		Payload:     msg,
-//		Time:        time.Now(),
-//	}
-//	err := client.hub.MessageService.CreateMessages(ctx, &messagePacket)
-//	if err != nil {
-//		logger.WithError(err).Errorln("store message fail")
-//		return
-//	}
-//	payload, err := sonic.Marshal(SocketMessage{
-//		Event:   NewMessage,
-//		Payload: messagePacket,
-//	})
-//	if err != nil {
-//		logger.WithError(err).Errorf("marshal msg to byte array fail")
-//		return
-//	}
-//	if recipientId == "" {
-//		// handle send message single user
-//		client.hub.EmitToSpecificClient(payload, recipientId)
-//	} else {
-//		// handle send message group
-//		client.hub.BroadcastSocketEventToAllClientExceptMe(payload, senderId)
-//	}
-//}
-
 func (client *Client) handleJoinRoom(message ReceivedMessage) {
 	var (
 		logger = denny.GetLogger(ctx)

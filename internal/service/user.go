@@ -54,6 +54,11 @@ func (a *userService) GetByUserId(
 		logger.WithError(err)
 		return domain.User{}, common.SystemError
 	}
+	file, errCode := a.fileService.Get(ctx, acc.FileId)
+	if errCode != common.OK {
+		logger.Errorf("Find user file fail: %d", errCode)
+		return domain.User{}, common.SystemError
+	}
 	return domain.User{
 		UserId:      acc.UserId,
 		Username:    acc.UserName,
@@ -61,6 +66,9 @@ func (a *userService) GetByUserId(
 		PhoneNumber: acc.PhoneNumber,
 		Status:      string(acc.Status),
 		Code:        "",
+		DateOfBirth: acc.DateOfBirth,
+		Gender:      acc.Gender,
+		Url:         file.GetSecureURL(),
 	}, common.OK
 }
 
@@ -94,8 +102,8 @@ func (a *userService) Get(
 	}
 	resp.Info = &chat_app.UserInfo{
 		Username:    acc.UserName,
-		PhoneNumber: acc.Email,
-		Email:       acc.PhoneNumber,
+		PhoneNumber: acc.PhoneNumber,
+		Email:       acc.Email,
 		Status:      string(acc.Status),
 		UserId:      req.GetUserId(),
 		DateOfBirth: helper.FromTimeToString(acc.DateOfBirth, helper.ApiClientDateFormat),

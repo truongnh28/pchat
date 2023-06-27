@@ -54,9 +54,11 @@ func (m *messageRepositoryImpl) GetChatHistoryBetweenTwoUsers(
 	}
 
 	var filter = bson.M{
-		"senderid":    senderId,
-		"recipientid": recipientId,
-		"time":        timeRange,
+		"$or": []bson.M{
+			bson.M{"senderid": senderId, "recipientid": recipientId},
+			bson.M{"senderid": recipientId, "recipientid": senderId},
+		},
+		"time": timeRange,
 	}
 
 	if isGroup {

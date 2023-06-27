@@ -4,6 +4,7 @@ import (
 	"chat-app/config"
 	"chat-app/helper"
 	"chat-app/internal/common"
+	"chat-app/internal/domain"
 	"chat-app/internal/service"
 	cache "chat-app/pkg/client/redis"
 	chat_app "chat-app/proto/chat-app"
@@ -20,6 +21,7 @@ type auth struct {
 	redisCli    cache.IRedisClient
 	mailService service.MailService
 	userService service.UserService
+	roomService service.RoomService
 }
 
 func (a *auth) Register(
@@ -213,7 +215,21 @@ func (a *auth) Login(
 		int(a.config.ExpiredTime), "/", "",
 		httpCtx.Request.TLS != nil, false)
 	resp.AccessToken = ""
+	a.setDeviceToken(ctx, request.GetDeviceToken())
 	return
+}
+
+func (a *auth) setDeviceToken(ctx context.Context, deviceToken string) {
+	userId, logger := helper.GetUserAndLogger(ctx)
+	a.redisCli.SAdd(ctx, userId, deviceToken)
+	rooms, errCode := a.roomService.Get(ctx, domain.Room{UserId: userId})
+	if errCode != common.OK {
+		logger.Errorln("get room fail")
+		return
+	}
+	for _, i := range rooms {
+		a.redisCli.SAdd(ctx, i.GroupId, deviceToken)
+	}
 }
 
 func NewAuth(
@@ -222,6 +238,7 @@ func NewAuth(
 	redisCli cache.IRedisClient,
 	mailService service.MailService,
 	authConfig *config.AuthenticationConfig,
+	roomService service.RoomService,
 ) chat_app.AuthServer {
 	return &auth{
 		authService: authService,
@@ -229,5 +246,6 @@ func NewAuth(
 		config:      authConfig,
 		redisCli:    redisCli,
 		mailService: mailService,
+		roomService: roomService,
 	}
 }

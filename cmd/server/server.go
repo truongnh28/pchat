@@ -7,6 +7,7 @@ import (
 	"chat-app/internal/service"
 	"chat-app/internal/ws"
 	"chat-app/pkg/client/cloudinary"
+	"chat-app/pkg/client/firebase"
 	"chat-app/pkg/client/redis"
 	"chat-app/pkg/middleware"
 	"chat-app/pkg/repositories"
@@ -40,6 +41,7 @@ func setupHandler(s *denny.Denny) {
 
 	redisCli := redis.GetRedisClient(config.GetAppConfig().Redis)
 	cld := cloudinary.GetCloudinaryAPI(config.GetAppConfig().Cloudinary)
+	fb := firebase.GetFirebase(_const.GoogleAccountCertPath)
 
 	chatAppDB := repositories.InitChatAppDatabase()
 	chatMessageDB := repositories.InitChatMessageDatabase()
@@ -58,12 +60,13 @@ func setupHandler(s *denny.Denny) {
 	})
 
 	socketService := service.NewSocketService(hub)
-	messageService := service.NewMessageService(messageRepo, socketService)
 	mailService := service.NewMailService(config.GetAppConfig().Mail, _const.MailTemplatePath)
 	fileService := service.NewFileService(cld, fileRepo)
 	userService := service.NewUserService(userRepo, fileService)
 	roomService := service.NewRoomService(roomRepo)
 	groupService := service.NewGroupService(groupRepo, roomRepo, fileService)
+	notificationService := service.NewNotificationService(fb, userService, redisCli)
+	messageService := service.NewMessageService(messageRepo, socketService, notificationService)
 	authService := service.NewAuthenService(
 		service.GetJWTInstance(),
 		redisCli,
@@ -77,6 +80,7 @@ func setupHandler(s *denny.Denny) {
 			redisCli,
 			mailService,
 			config.GetAppConfig().Authentication,
+			roomService,
 		),
 	)
 	apiGroup.Use(middleware.HTTPAuthentication)

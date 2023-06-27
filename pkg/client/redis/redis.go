@@ -10,8 +10,6 @@ import (
 )
 
 type IRedisClient interface {
-	HSet(ctx context.Context, key, field string, values interface{}) *redis.IntCmd
-	HGet(ctx context.Context, key, field string) *redis.StringCmd
 	Set(
 		ctx context.Context,
 		key string,
@@ -20,13 +18,22 @@ type IRedisClient interface {
 	) *redis.StatusCmd
 	Get(ctx context.Context, key string) *redis.StringCmd
 	HDel(ctx context.Context, key, field string) *redis.IntCmd
+	HSet(ctx context.Context, key, field string, values interface{}) *redis.IntCmd
+	HGet(ctx context.Context, key, field string) *redis.StringCmd
 	LPush(ctx context.Context, key string, values ...interface{}) *redis.IntCmd
-	LPop(ctx context.Context, key string) *redis.StringCmd
 	RPush(ctx context.Context, key string, values ...interface{}) *redis.IntCmd
+	LPop(ctx context.Context, key string) *redis.StringCmd
+	RPop(ctx context.Context, key string) *redis.StringCmd
+	LRem(ctx context.Context, key string, count int64, value string) *redis.IntCmd
 	Del(ctx context.Context, key string) *redis.IntCmd
 	Publish(ctx context.Context, channel string, message any) *redis.IntCmd
 	Subscribe(ctx context.Context, channel []string) *redis.PubSub
 	Ping(ctx context.Context) *redis.StatusCmd
+	LRang(ctx context.Context, key string, startIndex, endIndex int64) *redis.StringSliceCmd
+	SAdd(ctx context.Context, key string, value ...any) *redis.IntCmd
+	SMembers(ctx context.Context, key string) *redis.StringSliceCmd
+	SIsMember(ctx context.Context, key, value string) *redis.BoolCmd
+	SRem(ctx context.Context, key, value string) *redis.IntCmd
 }
 
 type redisClientImpl struct {
@@ -119,4 +126,41 @@ func (r *redisClientImpl) LPop(ctx context.Context, key string) *redis.StringCmd
 
 func (r *redisClientImpl) Del(ctx context.Context, key string) *redis.IntCmd {
 	return r.client.Del(ctx, key)
+}
+
+func (r *redisClientImpl) RPop(ctx context.Context, key string) *redis.StringCmd {
+	return r.client.RPop(ctx, key)
+}
+
+func (r *redisClientImpl) LRem(
+	ctx context.Context,
+	key string,
+	count int64,
+	value string,
+) *redis.IntCmd {
+	return r.client.LRem(ctx, key, count, value)
+}
+
+func (r *redisClientImpl) LRang(
+	ctx context.Context,
+	key string,
+	startIndex, endIndex int64,
+) *redis.StringSliceCmd {
+	return r.client.LRange(ctx, key, startIndex, endIndex)
+}
+
+func (r *redisClientImpl) SAdd(ctx context.Context, key string, value ...any) *redis.IntCmd {
+	return r.client.SAdd(ctx, key, value)
+}
+
+func (r *redisClientImpl) SMembers(ctx context.Context, key string) *redis.StringSliceCmd {
+	return r.client.SMembers(ctx, key)
+}
+
+func (r *redisClientImpl) SIsMember(ctx context.Context, key, value string) *redis.BoolCmd {
+	return r.client.SIsMember(ctx, key, value)
+}
+
+func (r *redisClientImpl) SRem(ctx context.Context, key, value string) *redis.IntCmd {
+	return r.client.SRem(ctx, key, value)
 }

@@ -14,13 +14,15 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/websocket v0.0.0-20170926233335-4201258b820c
 	github.com/hashicorp/go-multierror v1.0.0
+	github.com/pion/rtcp v1.2.10
+	github.com/pion/webrtc/v3 v3.2.10
 	github.com/sceneryback/kafka-best-practices v0.0.0-20200705080656-c72c1566d240
 	github.com/sirupsen/logrus v1.6.0
 	github.com/spf13/viper v1.8.1
-	github.com/stretchr/testify v1.8.2
+	github.com/stretchr/testify v1.8.4
 	github.com/whatvn/denny v1.0.18
 	go.mongodb.org/mongo-driver v1.11.7
-	golang.org/x/crypto v0.8.0
+	golang.org/x/crypto v0.9.0
 	golang.org/x/sync v0.1.0
 	google.golang.org/api v0.114.0
 	google.golang.org/grpc v1.54.0
@@ -82,6 +84,20 @@ require (
 	github.com/pelletier/go-toml v1.9.3 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.7 // indirect
 	github.com/pierrec/lz4 v2.4.1+incompatible // indirect
+	github.com/pion/datachannel v1.5.5 // indirect
+	github.com/pion/dtls/v2 v2.2.7 // indirect
+	github.com/pion/ice/v2 v2.3.7 // indirect
+	github.com/pion/interceptor v0.1.17 // indirect
+	github.com/pion/logging v0.2.2 // indirect
+	github.com/pion/mdns v0.0.7 // indirect
+	github.com/pion/randutil v0.1.0 // indirect
+	github.com/pion/rtp v1.7.13 // indirect
+	github.com/pion/sctp v1.8.7 // indirect
+	github.com/pion/sdp/v3 v3.0.6 // indirect
+	github.com/pion/srtp/v2 v2.0.15 // indirect
+	github.com/pion/stun v0.6.0 // indirect
+	github.com/pion/transport/v2 v2.2.1 // indirect
+	github.com/pion/turn/v2 v2.1.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20190826022208-cac0b30c2563 // indirect
@@ -99,9 +115,9 @@ require (
 	github.com/youmark/pkcs8 v0.0.0-20181117223130-1be2e3e5546d // indirect
 	go.opencensus.io v0.24.0 // indirect
 	golang.org/x/arch v0.3.0 // indirect
-	golang.org/x/net v0.9.0 // indirect
+	golang.org/x/net v0.10.0 // indirect
 	golang.org/x/oauth2 v0.7.0 // indirect
-	golang.org/x/sys v0.7.0 // indirect
+	golang.org/x/sys v0.8.0 // indirect
 	golang.org/x/text v0.9.0 // indirect
 	golang.org/x/time v0.1.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
@@ -109,7 +125,7 @@ require (
 	google.golang.org/genproto v0.0.0-20230526161137-0005af68ea54 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20230525234035-dd9d682886f9 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230525234030-28d5490b6b19 // indirect
-	google.golang.org/grpc/examples v0.0.0-20230623205128-0673105ebcb9 // indirect
+	google.golang.org/grpc/examples v0.0.0-20230626182339-789cf4e39455 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect

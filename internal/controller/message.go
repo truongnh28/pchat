@@ -71,7 +71,7 @@ func (m *message) CreateMessage(
 	}
 
 	if text != "" {
-		errCode = m.messageService.CreateMessages(ctx, roomId, &domain.ChatMessage{
+		errCode = m.messageService.CreateMessage(ctx, roomId, &domain.ChatMessage{
 			SenderID:    userId,
 			RecipientID: roomId,
 			Message:     text,
@@ -84,7 +84,7 @@ func (m *message) CreateMessage(
 			FileName: fileHeader.Filename,
 			FileData: file,
 		})
-		errCode = m.messageService.CreateMessages(ctx, roomId, &domain.ChatMessage{
+		errCode = m.messageService.CreateMessage(ctx, roomId, &domain.ChatMessage{
 			SenderID:    userId,
 			RecipientID: roomId,
 			Message:     uploadRes.SecureURL,
@@ -135,6 +135,11 @@ func (m *message) GetChatHistory(ctx context.Context, req *chat_app.ChatHistoryR
 	}
 	isValid, isGroup := m.validateRoom(ctx, req.GetRecipientId())
 	if !isValid {
+		errCode = common.InvalidRequest
+		logger.Errorln("Get room request err: ", err)
+		return
+	}
+	if userId == req.GetRecipientId() {
 		errCode = common.InvalidRequest
 		logger.Errorln("Get room request err: ", err)
 		return

@@ -1,6 +1,7 @@
 package firebase
 
 import (
+	"chat-app/internal/domain"
 	"context"
 	fb "firebase.google.com/go"
 	"fmt"
@@ -13,9 +14,21 @@ import (
 )
 
 type Firebase interface {
-	SendToToken(ctx context.Context, token string) error
-	SendToTopic(ctx context.Context, topic string) error
-	SendMultiClient(ctx context.Context, tokens []string) error
+	SendToToken(
+		ctx context.Context,
+		notificationMessage domain.NotificationMessage,
+		token string,
+	) error
+	SendToTopic(
+		ctx context.Context,
+		notificationMessage domain.NotificationMessage,
+		topic string,
+	) error
+	SendMultiClient(
+		ctx context.Context,
+		notificationMessage domain.NotificationMessage,
+		tokens []string,
+	) error
 }
 
 type firebase struct {
@@ -26,7 +39,8 @@ type firebase struct {
 var f *firebase
 var firebaseOne sync.Once
 
-func GetFirebase(ctx context.Context, certPath string) Firebase {
+func GetFirebase(certPath string) Firebase {
+	ctx := context.Background()
 	firebaseOne.Do(func() {
 
 		serviceAccountKeyFilePath, err := filepath.Abs(certPath)
@@ -53,7 +67,11 @@ func GetFirebase(ctx context.Context, certPath string) Firebase {
 	return f
 }
 
-func (f2 *firebase) SendToToken(ctx context.Context, token string) error {
+func (f2 *firebase) SendToToken(
+	ctx context.Context,
+	notificationMessage domain.NotificationMessage,
+	token string,
+) error {
 	logger := denny.GetLogger(ctx)
 	client, err := f2.FirebaseApp.Messaging(ctx)
 	if err != nil {
@@ -62,8 +80,9 @@ func (f2 *firebase) SendToToken(ctx context.Context, token string) error {
 	}
 	message := &messaging.Message{
 		Notification: &messaging.Notification{
-			Title: "Firebase Notification",
-			Body:  "This is firebase notification",
+			Title:    notificationMessage.Title,
+			Body:     notificationMessage.Body,
+			ImageURL: notificationMessage.ImageURL,
 		},
 		Token: token,
 	}
@@ -76,7 +95,11 @@ func (f2 *firebase) SendToToken(ctx context.Context, token string) error {
 	return nil
 }
 
-func (f2 *firebase) SendToTopic(ctx context.Context, topic string) error {
+func (f2 *firebase) SendToTopic(
+	ctx context.Context,
+	notificationMessage domain.NotificationMessage,
+	topic string,
+) error {
 	logger := denny.GetLogger(ctx)
 	message := &messaging.Message{
 		Data: map[string]string{
@@ -95,12 +118,17 @@ func (f2 *firebase) SendToTopic(ctx context.Context, topic string) error {
 	return nil
 }
 
-func (f2 *firebase) SendMultiClient(ctx context.Context, tokens []string) error {
+func (f2 *firebase) SendMultiClient(
+	ctx context.Context,
+	notificationMessage domain.NotificationMessage,
+	tokens []string,
+) error {
 	logger := denny.GetLogger(ctx)
 	message := &messaging.MulticastMessage{
 		Notification: &messaging.Notification{
-			Title: "Firebase Notification Multi",
-			Body:  "This is firebase notification",
+			Title:    notificationMessage.Title,
+			Body:     notificationMessage.Body,
+			ImageURL: notificationMessage.ImageURL,
 		},
 		Tokens: tokens,
 	}
