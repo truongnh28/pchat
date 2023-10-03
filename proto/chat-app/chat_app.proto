@@ -3,7 +3,9 @@ package chat_app;
 option go_package = "chat-app/proto/chat-app";
 
 service Friends {
-  rpc AddFriend(EmptyRequest) returns (BasicResponse);
+  rpc AddFriend(FriendRequest) returns (BasicResponse);
+  rpc GetAllFriendByUserId(FriendRequest) returns (GetFriendResponse);
+  rpc RemoveFriend(FriendRequest) returns (BasicResponse);
 }
 
 service Auth {
@@ -15,20 +17,25 @@ service Auth {
 }
 
 service Message {
-  rpc CreateMessage(EmptyRequest) returns (BasicResponse);
+  rpc CreateMessage(EmptyRequest) returns (CreateMessageResponse);
   rpc GetChatHistory(ChatHistoryRequest) returns (ChatHistoryResponse);
+  rpc GetLastChatHistory(EmptyRequest) returns (GetAllChatRoomResponse);
 }
 
 service User {
   rpc Get(GetUserRequest) returns (GetUserResponse);
   rpc Update(UpdateUserRequest) returns (BasicResponse);
+  rpc Search(SearchUserRequest) returns(SearchUserResponse);
+  rpc SearchFriend(SearchUserRequest) returns(SearchUserResponse);
 }
 
 service Group {
   rpc Create(CreateGroupRequest) returns (CreateGroupResponse);
   rpc Get(GroupRequest) returns (GetGroupResponse);
+  rpc GetAllGroupOfCurrentUser(EmptyRequest) returns (GetAllGroupOfCurrentUserResponse);
   rpc Update(EmptyRequest) returns (UpdateGroupResponse);
   rpc JoinGroup(JoinGroupRequest) returns (BasicResponse);
+  rpc AddListUser(AddListUserRequest) returns (CreateGroupResponse);
   rpc Delete(GroupRequest) returns (BasicResponse);
 }
 
@@ -134,12 +141,22 @@ message ChatMessage {
   string recipient_id = 2;
   string message = 3;
   string time = 4;
+  string file_name = 5;
+  uint32 height = 6;
+  uint32 width = 7;
+  uint32 file_size = 8;
+  string url = 9;
+  string resource_type = 10;
 }
 
 message ChatHistoryRequest{
-  string recipient_id = 2;
-  string start_time = 4;
-  string end_time = 5;
+  string recipient_id = 1;
+  string start_time = 2;
+  string end_time = 3;
+}
+
+message LastChatHistoryRequest{
+  string recipient_id = 1;
 }
 
 message ChatHistoryResponse{
@@ -151,9 +168,17 @@ message ChatHistoryResponse{
   Paging paging = 6;
 }
 
+message LastChatHistoryResponse{
+  int32 return_code = 1;
+  string return_message = 2;
+  int32 sub_return_code = 3;
+  string sub_return_message = 4;
+  ChatMessage chat_history = 5;
+}
 
 message CreateGroupRequest {
   string group_name = 1;
+  repeated string user_ids = 2;
 }
 
 message GroupInfo {
@@ -193,4 +218,80 @@ message UpdateGroupResponse {
 
 message JoinGroupRequest {
   string group_id = 1;
+}
+
+message GetAllGroupOfCurrentUserResponse {
+  int32 return_code = 1;
+  string return_message = 2;
+  int32 sub_return_code = 3;
+  string sub_return_message = 4;
+  repeated string group_ids = 5;
+}
+
+message FriendRequest {
+  string user_id = 1;
+}
+
+message Friend {
+  string user_id_1 = 1;
+  string user_id_2 = 2;
+}
+
+message GetFriendResponse {
+  int32 return_code = 1;
+  string return_message = 2;
+  int32 sub_return_code = 3;
+  string sub_return_message = 4;
+  repeated UserInfo user_infos = 5;
+}
+
+message SearchUserRequest {
+  string username = 1;
+}
+
+message SearchUserResponse {
+  int32 return_code = 1;
+  string return_message = 2;
+  int32 sub_return_code = 3;
+  string sub_return_message = 4;
+  repeated UserInfo user_infos = 5;
+}
+
+message RoomShortDetail {
+  string room_name = 1;
+  string room_avt = 2;
+  string room_id = 3;
+  bool is_group = 4;
+  ChatMessage chat_message = 5;
+}
+
+message GetAllChatRoomResponse {
+  int32 return_code = 1;
+  string return_message = 2;
+  int32 sub_return_code = 3;
+  string sub_return_message = 4;
+  repeated RoomShortDetail room = 5;
+}
+
+message FileMessageProperties {
+  string file_name = 1;
+  uint32 height = 2;
+  uint32 width = 3;
+  uint32 file_size = 4;
+  string url = 5;
+  string resource_type = 6;
+  string time = 7;
+}
+
+message CreateMessageResponse {
+  int32 return_code = 1;
+  string return_message = 2;
+  int32 sub_return_code = 3;
+  string sub_return_message = 4;
+  ChatMessage message = 5;
+}
+
+message AddListUserRequest {
+  string group_id = 1;
+  repeated string user_ids = 2;
 }

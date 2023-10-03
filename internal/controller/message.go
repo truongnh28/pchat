@@ -11,21 +11,73 @@ import (
 	"fmt"
 	"github.com/whatvn/denny"
 	"net/http"
+	"sort"
 	"time"
 )
 
 type message struct {
 	messageService service.MessageService
 	mediaService   service.FileService
-	socketService  service.SocketService
-	userService    service.UserService
-	roomService    service.RoomService
+}
+
+func (m *message) GetLastChatHistory(
+	ctx context.Context,
+	req *chat_app.EmptyRequest,
+) (resp *chat_app.GetAllChatRoomResponse, err error) {
+	var (
+		errCode        = common.OK
+		userId, logger = helper.GetUserAndLogger(ctx)
+	)
+
+	defer func() {
+		if err != nil {
+			logger.WithError(err).Error("get chat history request failed")
+		}
+		buildResponse(errCode, resp)
+		err = nil
+	}()
+
+	resp = new(chat_app.GetAllChatRoomResponse)
+
+	roomChatDetails, returnCode := m.messageService.GetLastChatHistory(
+		ctx,
+		userId,
+	)
+	if returnCode != common.OK {
+		err = fmt.Errorf("get chat history failed")
+		errCode = returnCode
+		return
+	}
+	sort.Slice(roomChatDetails, func(i, j int) bool {
+		return roomChatDetails[i].Message.Time.Before(roomChatDetails[j].Message.Time)
+	})
+	for _, room := range roomChatDetails {
+		resp.Room = append(resp.Room, &chat_app.RoomShortDetail{
+			RoomName: room.RoomName,
+			RoomAvt:  room.RoomImage,
+			RoomId:   room.RoomId,
+			IsGroup:  room.IsGroup,
+			ChatMessage: &chat_app.ChatMessage{
+				SenderId:     room.Message.SenderID,
+				RecipientId:  room.Message.RecipientID,
+				Message:      room.Message.Message,
+				Time:         room.Message.Time.String(),
+				FileName:     room.Message.FileName,
+				Height:       room.Message.Height,
+				Width:        room.Message.Width,
+				FileSize:     room.Message.FileSize,
+				Url:          room.Message.URL,
+				ResourceType: string(room.Message.Type),
+			},
+		})
+	}
+	return
 }
 
 func (m *message) CreateMessage(
 	ctx context.Context,
 	request *chat_app.EmptyRequest,
-) (resp *chat_app.BasicResponse, err error) {
+) (resp *chat_app.CreateMessageResponse, err error) {
 	var (
 		errCode        = common.OK
 		userId, logger = helper.GetUserAndLogger(ctx)
@@ -37,7 +89,7 @@ func (m *message) CreateMessage(
 		buildResponse(errCode, resp)
 		err = nil
 	}()
-	resp = new(chat_app.BasicResponse)
+	resp = new(chat_app.CreateMessageResponse)
 	httpCtx, ok = ctx.(*denny.Context)
 	if !ok {
 		errCode = common.SystemError
@@ -63,7 +115,7 @@ func (m *message) CreateMessage(
 		logger.Errorln("Get file from request err: ", err)
 		return
 	}
-	isValid, _ := m.validateRoom(ctx, roomId)
+	isValid, _ := m.messageService.ValidateRoom(ctx, roomId)
 	if !isValid {
 		errCode = common.InvalidRequest
 		logger.Errorln("Get room request err")
@@ -76,6 +128,7 @@ func (m *message) CreateMessage(
 			RecipientID: roomId,
 			Message:     text,
 			Time:        time.Now(),
+			Type:        domain.MessageText,
 		})
 	}
 
@@ -87,9 +140,32 @@ func (m *message) CreateMessage(
 		errCode = m.messageService.CreateMessage(ctx, roomId, &domain.ChatMessage{
 			SenderID:    userId,
 			RecipientID: roomId,
-			Message:     uploadRes.SecureURL,
+			Message:     "",
 			Time:        time.Now(),
+			FileName:    uploadRes.GetOriginalFileName(),
+			Height:      uploadRes.GetHeight(),
+			Width:       uploadRes.GetWidth(),
+			FileSize:    uploadRes.GetFileSize(),
+			URL:         uploadRes.GetSecureURL(),
+			Type: domain.StringToMessageType(
+				uploadRes.ResourceType,
+				uploadRes.GetSecureURL(),
+			),
 		})
+		resp.Message = &chat_app.ChatMessage{
+			SenderId:    userId,
+			RecipientId: roomId,
+			Message:     "",
+			Time:        time.Now().String(),
+			FileName:    uploadRes.OriginalFilename,
+			Height:      uploadRes.Height,
+			Width:       uploadRes.Width,
+			FileSize:    uploadRes.FileSize,
+			Url:         uploadRes.GetSecureURL(),
+			ResourceType: string(
+				domain.StringToMessageType(uploadRes.ResourceType, uploadRes.GetSecureURL()),
+			),
+		}
 	}
 
 	return
@@ -133,7 +209,7 @@ func (m *message) GetChatHistory(ctx context.Context, req *chat_app.ChatHistoryR
 		logger.WithError(err)
 		return
 	}
-	isValid, isGroup := m.validateRoom(ctx, req.GetRecipientId())
+	isValid, isGroup := m.messageService.ValidateRoom(ctx, req.GetRecipientId())
 	if !isValid {
 		errCode = common.InvalidRequest
 		logger.Errorln("Get room request err: ", err)
@@ -161,55 +237,28 @@ func (m *message) GetChatHistory(ctx context.Context, req *chat_app.ChatHistoryR
 	respChatHistory := make([]*chat_app.ChatMessage, 0)
 	for _, it := range chatHistory {
 		respChatHistory = append(respChatHistory, &chat_app.ChatMessage{
-			SenderId:    it.SenderID,
-			RecipientId: it.RecipientID,
-			Message:     it.Message,
-			Time:        it.Time.String(),
+			SenderId:     it.SenderID,
+			RecipientId:  it.RecipientID,
+			Message:      it.Message,
+			Time:         it.Time.String(),
+			FileName:     it.FileName,
+			Height:       it.Height,
+			Width:        it.Width,
+			FileSize:     it.FileSize,
+			Url:          it.URL,
+			ResourceType: string(it.Type),
 		})
 	}
 	resp.ChatHistory = respChatHistory
 	return
 }
 
-func (m *message) validateRoom(ctx context.Context, roomId string) (bool, bool) {
-	var (
-		logger   = denny.GetLogger(ctx)
-		errUser  = true
-		errGroup = true
-		isGroup  = true
-	)
-	// if send user to user: room_id == user_id_recipient
-	// if send user to group: room_id == group_id
-	_, errCode := m.userService.GetByUserId(ctx, roomId)
-	if errCode != common.OK {
-		logger.Errorln("check user fail: ", errCode)
-		errUser = false
-	}
-	if errCode == common.OK {
-		isGroup = false
-	}
-	_, errCode = m.roomService.Get(ctx, domain.Room{
-		GroupId: roomId,
-	})
-	if errCode != common.OK {
-		logger.Errorln("check group fail: ", errCode)
-		errGroup = false
-	}
-	return errUser || errGroup, isGroup
-}
-
 func NewMessage(
 	messageService service.MessageService,
 	mediaService service.FileService,
-	socketService service.SocketService,
-	userService service.UserService,
-	roomService service.RoomService,
 ) chat_app.MessageServer {
 	return &message{
 		messageService: messageService,
 		mediaService:   mediaService,
-		socketService:  socketService,
-		userService:    userService,
-		roomService:    roomService,
 	}
 }

@@ -18,6 +18,92 @@ type group struct {
 	fileService  service.FileService
 }
 
+func (g *group) AddListUser(
+	ctx context.Context,
+	request *chat_app.AddListUserRequest,
+) (resp *chat_app.CreateGroupResponse, err error) {
+	var (
+		errCode   = common.OK
+		_, logger = helper.GetUserAndLogger(ctx)
+		groupResp = &domain.Group{}
+	)
+	defer func() {
+		buildResponse(errCode, resp)
+		err = nil
+	}()
+	resp = new(chat_app.CreateGroupResponse)
+	if request.GetGroupId() == "" {
+		errCode = common.InvalidRequest
+		logger.Errorln("group_name invalid")
+		return
+	}
+	if len(request.GetUserIds()) < 1 {
+		errCode = common.InvalidRequest
+		logger.Errorln("list user invalid")
+		return
+	}
+
+	for _, userId := range request.GetUserIds() {
+		_, errCode = g.userService.GetByUserId(ctx, userId)
+		if errCode != common.OK {
+			logger.Errorf("user is valid: %s", userId)
+			continue
+		}
+		errCode = g.roomService.Create(ctx, domain.Room{
+			GroupId: request.GetGroupId(),
+			UserId:  userId,
+		})
+		if errCode != common.OK {
+			logger.Errorf(
+				"add user in group fail: userId: %s, group_id: %s",
+				userId,
+				request.GetGroupId(),
+			)
+			continue
+		}
+	}
+	groupResp, errCode = g.groupService.Get(ctx, request.GetGroupId())
+	if errCode != common.OK {
+		logger.Errorln("get group fail")
+		return
+	}
+	resp.Info = &chat_app.GroupInfo{
+		GroupId:   groupResp.Id,
+		GroupName: groupResp.Name,
+		AvatarUrl: groupResp.ImageUrl,
+		UserId:    groupResp.UserId,
+	}
+	return
+}
+
+func (g *group) GetAllGroupOfCurrentUser(
+	ctx context.Context,
+	request *chat_app.EmptyRequest,
+) (resp *chat_app.GetAllGroupOfCurrentUserResponse, err error) {
+	var (
+		errCode        = common.OK
+		userId, logger = helper.GetUserAndLogger(ctx)
+		rooms          = make([]domain.Room, 0)
+		groups         = make([]string, 0)
+	)
+	defer func() {
+		buildResponse(errCode, resp)
+		err = nil
+	}()
+	resp = new(chat_app.GetAllGroupOfCurrentUserResponse)
+
+	rooms, errCode = g.roomService.Get(ctx, domain.Room{UserId: userId})
+	if errCode != common.OK {
+		logger.Errorln("get room fail")
+		return
+	}
+	for _, i := range rooms {
+		groups = append(groups, i.GroupId)
+	}
+	resp.GroupIds = groups
+	return
+}
+
 func (g *group) Create(
 	ctx context.Context,
 	request *chat_app.CreateGroupRequest,
@@ -37,14 +123,46 @@ func (g *group) Create(
 		logger.Errorln("group_name invalid")
 		return
 	}
+	if len(request.GetUserIds()) < 1 {
+		errCode = common.InvalidRequest
+		logger.Errorln("list user invalid")
+		return
+	}
 	groupResp, errCode = g.groupService.Create(ctx, request.GetGroupName())
 	if errCode != common.OK {
 		logger.Errorln("create group fail")
 		return
 	}
+	for _, userId := range request.GetUserIds() {
+		_, errCode = g.userService.GetByUserId(ctx, userId)
+		if errCode != common.OK {
+			logger.Errorf("user is valid: %s", userId)
+			continue
+		}
+		errCode = g.roomService.Create(ctx, domain.Room{
+			GroupId: groupResp.Id,
+			UserId:  userId,
+		})
+		if errCode != common.OK {
+			logger.Errorf(
+				"add user in group fail: userId: %s, group_id: %s",
+				userId,
+				groupResp.Id,
+			)
+			continue
+		}
+	}
+	groupResp, errCode = g.groupService.Get(ctx, groupResp.Id)
+	if errCode != common.OK {
+		logger.Errorln("get group fail")
+		return
+	}
+
 	resp.Info = &chat_app.GroupInfo{
 		GroupId:   groupResp.Id,
 		GroupName: groupResp.Name,
+		AvatarUrl: groupResp.ImageUrl,
+		UserId:    groupResp.UserId,
 	}
 	return
 }

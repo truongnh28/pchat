@@ -3,8 +3,8 @@ package service
 import (
 	"chat-app/internal/common"
 	"chat-app/internal/domain"
+	"chat-app/internal/repositories"
 	"chat-app/models"
-	"chat-app/pkg/repositories"
 	"context"
 	"github.com/golang/glog"
 	"github.com/whatvn/denny"

@@ -3,6 +3,7 @@ package controller
 import (
 	"chat-app/helper"
 	"chat-app/internal/common"
+	"chat-app/internal/domain"
 	"chat-app/internal/service"
 	chat_app "chat-app/proto/chat-app"
 	"context"
@@ -10,6 +11,74 @@ import (
 
 type user struct {
 	userService service.UserService
+}
+
+func (u *user) SearchFriend(
+	ctx context.Context,
+	request *chat_app.SearchUserRequest,
+) (resp *chat_app.SearchUserResponse, err error) {
+	var (
+		errCode        = common.OK
+		userId, logger = helper.GetUserAndLogger(ctx)
+		users          = make([]domain.User, 0)
+	)
+	defer func() {
+		buildResponse(errCode, resp)
+		err = nil
+	}()
+	resp = new(chat_app.SearchUserResponse)
+	users, errCode = u.userService.GetByUserName(ctx, request.GetUsername(), userId)
+	if errCode != common.OK {
+		logger.Errorln("get by user name failed")
+		return
+	}
+	for _, i := range users {
+		resp.UserInfos = append(resp.UserInfos, &chat_app.UserInfo{
+			Username:    i.Username,
+			PhoneNumber: i.PhoneNumber,
+			Email:       i.Email,
+			Status:      i.Status,
+			UserId:      i.UserId,
+			DateOfBirth: i.DateOfBirth.String(),
+			Gender:      i.Gender.String(),
+			Url:         i.Url,
+		})
+	}
+	return
+}
+
+func (u *user) Search(
+	ctx context.Context,
+	request *chat_app.SearchUserRequest,
+) (resp *chat_app.SearchUserResponse, err error) {
+	var (
+		errCode   = common.OK
+		_, logger = helper.GetUserAndLogger(ctx)
+		users     = make([]domain.User, 0)
+	)
+	defer func() {
+		buildResponse(errCode, resp)
+		err = nil
+	}()
+	resp = new(chat_app.SearchUserResponse)
+	users, errCode = u.userService.GetByUserName(ctx, request.GetUsername(), "")
+	if errCode != common.OK {
+		logger.Errorln("get by user name failed")
+		return
+	}
+	for _, i := range users {
+		resp.UserInfos = append(resp.UserInfos, &chat_app.UserInfo{
+			Username:    i.Username,
+			PhoneNumber: i.PhoneNumber,
+			Email:       i.Email,
+			Status:      i.Status,
+			UserId:      i.UserId,
+			DateOfBirth: i.DateOfBirth.String(),
+			Gender:      i.Gender.String(),
+			Url:         i.Url,
+		})
+	}
+	return
 }
 
 func (u *user) Get(

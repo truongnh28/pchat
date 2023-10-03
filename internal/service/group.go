@@ -3,8 +3,8 @@ package service
 import (
 	"chat-app/internal/common"
 	"chat-app/internal/domain"
+	repositories2 "chat-app/internal/repositories"
 	"chat-app/models"
-	"chat-app/pkg/repositories"
 	"context"
 	"github.com/google/uuid"
 	"github.com/whatvn/denny"
@@ -27,8 +27,8 @@ type GroupService interface {
 }
 
 type groupService struct {
-	groupRepository repositories.GroupRepository
-	roomRepository  repositories.RoomRepository
+	groupRepository repositories2.GroupRepository
+	roomRepository  repositories2.RoomRepository
 	fileService     FileService
 }
 
@@ -145,8 +145,8 @@ func (g *groupService) Create(
 }
 
 func NewGroupService(
-	groupRepository repositories.GroupRepository,
-	roomRepository repositories.RoomRepository,
+	groupRepository repositories2.GroupRepository,
+	roomRepository repositories2.RoomRepository,
 	fileService FileService,
 ) GroupService {
 	return &groupService{

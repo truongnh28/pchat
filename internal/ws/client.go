@@ -12,7 +12,7 @@ import (
 
 const (
 	// Max wait time when writing message to peer
-	writeWait = 10 * time.Second
+	writeWait = 20 * time.Second
 	// Max time till next pong from peer
 	pongWait = 120 * time.Second
 	// Send ping interval, must be less than pong wait time

@@ -53,4 +53,14 @@ type File struct {
 	URL              string `gorm:"column:url"`
 	SecureURL        string `gorm:"column:secure_url"`
 	OriginalFilename string `gorm:"column:original_filename"`
+	Height           uint32 `gorm:"column:height"`
+	Width            uint32 `gorm:"column:width"`
+	FileSize         uint32 `gorm:"column:file_size"`
+	ResourceType     string `gorm:"column:resource_type"`
+}
+
+type Friend struct {
+	*gorm.Model
+	UserId1 string `gorm:"column:user_id_1;primary_key"`
+	UserId2 string `gorm:"column:user_id_2;primary_key"`
 }

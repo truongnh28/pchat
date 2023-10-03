@@ -4,8 +4,8 @@ import (
 	"chat-app/helper"
 	"chat-app/internal/common"
 	"chat-app/internal/domain"
+	"chat-app/internal/repositories"
 	"chat-app/models"
-	"chat-app/pkg/repositories"
 	chat_app "chat-app/proto/chat-app"
 	"context"
 	"github.com/google/uuid"
@@ -30,11 +30,68 @@ type UserService interface {
 		ctx context.Context,
 		userId string,
 	) (domain.User, common.SubReturnCode)
+	GetByUserName(
+		ctx context.Context,
+		username string,
+		isFriendOfUserId string,
+	) ([]domain.User, common.SubReturnCode)
 }
 
 type userService struct {
-	userRepository repositories.UserRepository
-	fileService    FileService
+	friendRepository repositories.FriendRepository
+	userRepository   repositories.UserRepository
+	fileService      FileService
+}
+
+func (a *userService) GetByUserName(
+	ctx context.Context,
+	username string,
+	friendOfUserId string,
+) ([]domain.User, common.SubReturnCode) {
+	var (
+		err          = error(nil)
+		logger       = denny.GetLogger(ctx)
+		accs         = make([]models.User, 0)
+		resp         = make([]domain.User, 0)
+		errCode      = common.OK
+		friends      = make([]models.Friend, 0)
+		friendUserId = make([]string, 0)
+	)
+	friends, err = a.friendRepository.GetAllByUserId(ctx, friendOfUserId)
+	if err != nil {
+		logger.Errorln("get frient of current fail")
+		return resp, errCode
+	}
+	for _, i := range friends {
+		if i.UserId1 == friendOfUserId {
+			friendUserId = append(friendUserId, i.UserId2)
+		} else {
+			friendUserId = append(friendUserId, i.UserId1)
+		}
+	}
+	accs, err = a.userRepository.GetByUsername(ctx, username, friendUserId)
+	if err != nil {
+		logger.WithError(err).Errorln("get by username from repository fail: ", err)
+		return resp, common.SystemError
+	}
+	for _, acc := range accs {
+		file, errCode := a.fileService.Get(ctx, acc.FileId)
+		if errCode != common.OK {
+			logger.Errorf("Find user file fail: %d", errCode)
+			continue
+		}
+		resp = append(resp, domain.User{
+			UserId:      acc.UserId,
+			Username:    acc.UserName,
+			Email:       acc.Email,
+			PhoneNumber: acc.PhoneNumber,
+			Status:      string(acc.Status),
+			DateOfBirth: acc.DateOfBirth,
+			Gender:      acc.Gender,
+			Url:         file.GetSecureURL(),
+		})
+	}
+	return resp, common.OK
 }
 
 func (a *userService) GetByUserId(
@@ -186,9 +243,11 @@ func (a *userService) Create(
 func NewUserService(
 	userRepository repositories.UserRepository,
 	fileService FileService,
+	friendRepository repositories.FriendRepository,
 ) UserService {
 	return &userService{
-		userRepository: userRepository,
-		fileService:    fileService,
+		userRepository:   userRepository,
+		fileService:      fileService,
+		friendRepository: friendRepository,
 	}
 }

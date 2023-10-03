@@ -5,6 +5,7 @@ import (
 	"chat-app/internal/domain"
 	"context"
 	"fmt"
+	"github.com/bytedance/sonic"
 	"github.com/cloudinary/cloudinary-go/v2"
 	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
 	"github.com/golang/glog"
@@ -43,7 +44,11 @@ func (c *cloudinaryAPI) Upload(
 	ctx context.Context,
 	in domain.UploadIn,
 ) (*uploader.UploadResult, error) {
-	resp, err := c.client.Upload.Upload(ctx, in.FileData, uploader.UploadParams{})
+	resp, err := c.client.Upload.Upload(ctx, in.FileData, uploader.UploadParams{
+		FilenameOverride: in.FileName,
+	})
+	e, _ := sonic.Marshal(resp)
+	fmt.Println(string(e))
 	if err != nil {
 		glog.Errorln("Create cloudinary fail: ", err)
 		return nil, err

@@ -7,6 +7,6 @@ actor "User B"
 note over "User A": User A was handshaked and subscribed
 "User A" -> "App Server": Send a message to user B
 "App Server" --> "User B": Send message to topic <user id B> \nwhich user B was subscribed
-"App Server" -> "Redis Server": Store this message to redis
+"App Server" -> "MongoDB": Store this message to mongodb
 
 @enduml

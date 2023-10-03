@@ -3,9 +3,9 @@ package service
 import (
 	"chat-app/internal/common"
 	"chat-app/internal/domain"
+	"chat-app/internal/repositories"
 	"chat-app/models"
 	"chat-app/pkg/client/cloudinary"
-	"chat-app/pkg/repositories"
 	"context"
 	"github.com/whatvn/denny"
 	"time"
@@ -43,6 +43,9 @@ func (f *fileService) Get(ctx context.Context, fileId uint) (*domain.File, commo
 		Id:               resp.ID,
 		SecureURL:        resp.SecureURL,
 		OriginalFilename: resp.OriginalFilename,
+		Height:           resp.Height,
+		Width:            resp.Width,
+		FileSize:         resp.FileSize,
 	}, common.OK
 }
 
@@ -71,6 +74,7 @@ func (f *fileService) Create(
 		logger.WithError(err).Errorln("Create fail err: ", err)
 		return nil, common.SystemError
 	}
+
 	file := models.File{
 		AssetID:          resp.AssetID,
 		PublicID:         resp.PublicID,
@@ -79,6 +83,10 @@ func (f *fileService) Create(
 		URL:              resp.URL,
 		SecureURL:        resp.SecureURL,
 		OriginalFilename: resp.OriginalFilename,
+		Height:           uint32(resp.Height),
+		Width:            uint32(resp.Width),
+		FileSize:         uint32(resp.Bytes),
+		ResourceType:     resp.ResourceType,
 	}
 	err = f.fileRepository.Create(ctx, &file)
 	if err != nil {
@@ -89,5 +97,9 @@ func (f *fileService) Create(
 		Id:               file.ID,
 		SecureURL:        resp.SecureURL,
 		OriginalFilename: resp.OriginalFilename,
+		Height:           uint32(resp.Height),
+		Width:            uint32(resp.Width),
+		FileSize:         uint32(resp.Bytes),
+		ResourceType:     resp.ResourceType,
 	}, common.OK
 }

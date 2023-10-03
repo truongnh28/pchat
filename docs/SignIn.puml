@@ -3,7 +3,7 @@ hide footbox
 
 actor "User"
 
-"User" -> "App Server": Login with user name + password
+"User" -> "App Server": Login with email + password
 "App Server" -> "Redis Server": Validate user with hashed password
 "App Server" --> "App Server": User authenticated then create JWT
 "App Server" --> "User": Return JWT to User

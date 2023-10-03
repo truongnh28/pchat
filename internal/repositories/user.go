@@ -23,10 +23,31 @@ type UserRepository interface {
 		status models.AccountStatus,
 	) (int64, error)
 	Validate(ctx context.Context, req models.User) error
+	GetByUsername(
+		ctx context.Context,
+		username string,
+		userIdList []string,
+	) ([]models.User, error)
 }
 
 type userRepository struct {
 	database *gorm.DB
+}
+
+func (a *userRepository) GetByUsername(
+	ctx context.Context,
+	username string,
+	userIdList []string,
+) ([]models.User, error) {
+	userProfiles := make([]models.User, 0)
+	query := a.database.WithContext(ctx).
+		Model(models.User{}).
+		Where("user_name like ?", "%"+username+"%")
+	if len(userIdList) > 0 {
+		query.Where("user_id in ?", userIdList)
+	}
+	err := query.Find(&userProfiles).Error
+	return userProfiles, err
 }
 
 func (a *userRepository) UpdateStatus(

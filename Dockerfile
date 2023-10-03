@@ -46,6 +46,7 @@ WORKDIR /app
 
 COPY --from=builder /app/chat-app /app/chat-app
 COPY --from=builder /app/config /app/config
+COPY --from=builder /app/asset /app/asset
 
 # List expose port(s)
 EXPOSE 8080

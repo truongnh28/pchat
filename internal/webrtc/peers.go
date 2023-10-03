@@ -1,7 +1,6 @@
 package webrtc
 
 import (
-	"chat-app/internal/ws"
 	"github.com/bytedance/sonic"
 	"github.com/gorilla/websocket"
 	"github.com/pion/rtcp"
@@ -13,8 +12,7 @@ import (
 
 var (
 	RoomsLock sync.RWMutex
-	Rooms     map[string]*Room
-	Streams   map[string]*Room
+	Rooms     map[string]*CallRoom
 )
 
 var (
@@ -34,9 +32,8 @@ var (
 	}
 )
 
-type Room struct {
+type CallRoom struct {
 	Peers *Peers
-	Hub   *ws.Hub
 }
 
 type Peers struct {
@@ -153,7 +150,7 @@ func (p *Peers) SignalPeerConnections() {
 			}
 
 			if err = p.Connections[i].Websocket.WriteJSON(&websocketMessage{
-				Event: "offer",
+				Event: Offer,
 				Data:  string(offerString),
 			}); err != nil {
 				return true
@@ -195,9 +192,4 @@ func (p *Peers) DispatchKeyFrame() {
 			})
 		}
 	}
-}
-
-type websocketMessage struct {
-	Event string `json:"event"`
-	Data  string `json:"data"`
 }

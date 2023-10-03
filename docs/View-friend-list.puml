@@ -4,8 +4,8 @@ hide footbox
 actor "User A"
 
 "User A" -> "App Server": Sent a GET with JWT request to get friend list
-"App Server" -> "Redis Server": Check JWT BlackList
-"App Server" -> "Redis Server": Validate JWT then get friend list
+"App Server" -> "Database": Check JWT BlackList
+"App Server" -> "Database": Get friend list
 "App Server" -> "User A": Return result to User A
 
 @enduml

@@ -1,22 +1,26 @@
 package webrtc
 
 import (
+	"context"
 	"github.com/bytedance/sonic"
 	"github.com/gorilla/websocket"
 	"github.com/pion/webrtc/v3"
+	"github.com/whatvn/denny"
 	"log"
-	"os"
 	"sync"
 )
 
-func RoomConn(c *websocket.Conn, p *Peers) {
-	var config webrtc.Configuration
-	if os.Getenv("ENVIRONMENT") == "PRODUCTION" {
-		config = turnConfig
-	}
+func RoomConn(ctx context.Context, c *websocket.Conn, p *Peers) {
+	var (
+		logger = denny.GetLogger(ctx)
+		config webrtc.Configuration
+	)
+	//if os.Getenv("ENVIRONMENT") == "PRODUCTION" {
+	//	config = turnConfig
+	//}
 	peerConnection, err := webrtc.NewPeerConnection(config)
 	if err != nil {
-		log.Print(err)
+		logger.WithError(err).Errorln("new peer connection err: ", err)
 		return
 	}
 	defer peerConnection.Close()
@@ -25,7 +29,7 @@ func RoomConn(c *websocket.Conn, p *Peers) {
 		if _, err := peerConnection.AddTransceiverFromKind(typ, webrtc.RTPTransceiverInit{
 			Direction: webrtc.RTPTransceiverDirectionRecvonly,
 		}); err != nil {
-			log.Print(err)
+			logger.WithError(err).Errorln("add transceiver from kind err: ", err)
 			return
 		}
 	}
@@ -42,7 +46,7 @@ func RoomConn(c *websocket.Conn, p *Peers) {
 	p.Connections = append(p.Connections, newPeer)
 	p.ListLock.Unlock()
 
-	log.Println(p.Connections)
+	logger.Infoln("connection: ", p.Connections)
 
 	// Trickle ICE. Emit server candidate to client
 	peerConnection.OnICECandidate(func(i *webrtc.ICECandidate) {
@@ -52,15 +56,15 @@ func RoomConn(c *websocket.Conn, p *Peers) {
 
 		candidateString, err := sonic.Marshal(i.ToJSON())
 		if err != nil {
-			log.Println(err)
+			logger.WithError(err).Errorln("marshal err: ", err)
 			return
 		}
 
 		if writeErr := newPeer.Websocket.WriteJSON(&websocketMessage{
-			Event: "candidate",
+			Event: Candidate,
 			Data:  string(candidateString),
 		}); writeErr != nil {
-			log.Println(writeErr)
+			logger.WithError(writeErr).Errorln("write json err: ", err)
 		}
 	})
 
@@ -69,7 +73,7 @@ func RoomConn(c *websocket.Conn, p *Peers) {
 		switch pp {
 		case webrtc.PeerConnectionStateFailed:
 			if err := peerConnection.Close(); err != nil {
-				log.Print(err)
+				logger.WithError(err)
 			}
 		case webrtc.PeerConnectionStateClosed:
 			p.SignalPeerConnections()
@@ -105,31 +109,31 @@ func RoomConn(c *websocket.Conn, p *Peers) {
 			log.Println(err)
 			return
 		} else if err := sonic.Unmarshal(raw, &message); err != nil {
-			log.Println(err)
+			logger.WithError(err).Errorln("unmarshal err: ", err)
 			return
 		}
 
 		switch message.Event {
-		case "candidate":
+		case Candidate:
 			candidate := webrtc.ICECandidateInit{}
 			if err := sonic.Unmarshal([]byte(message.Data), &candidate); err != nil {
-				log.Println(err)
+				logger.WithError(err).Errorln("unmarshal err: ", err)
 				return
 			}
 
 			if err := peerConnection.AddICECandidate(candidate); err != nil {
-				log.Println(err)
+				logger.WithError(err).Errorln("add ICE candidate err: ", err)
 				return
 			}
-		case "answer":
+		case Answer:
 			answer := webrtc.SessionDescription{}
 			if err := sonic.Unmarshal([]byte(message.Data), &answer); err != nil {
-				log.Println(err)
+				logger.WithError(err).Errorln("unmarshal err: ", err)
 				return
 			}
 
 			if err := peerConnection.SetRemoteDescription(answer); err != nil {
-				log.Println(err)
+				logger.WithError(err).Errorln("set remote description err: ", err)
 				return
 			}
 		}
